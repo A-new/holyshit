@@ -1,0 +1,9 @@
+HolyShit
+
+changelog:
+2013年5月3日 v0.2，label显示为高亮包
+
+2013年5月2日 v0.1, 显示label
+
+
+by lynnux, 2013年5月2日

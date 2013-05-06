@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "holyshit", "holyshit\holyshit.vcproj", "{60A859DD-2755-4959-95B5-AC378B76FD78}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "od2", "od2\od2.vcproj", "{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60A859DD-2755-4959-95B5-AC378B76FD78}.Debug|Win32.ActiveCfg = Debug|Win32
+		{60A859DD-2755-4959-95B5-AC378B76FD78}.Debug|Win32.Build.0 = Debug|Win32
+		{60A859DD-2755-4959-95B5-AC378B76FD78}.Release|Win32.ActiveCfg = Release|Win32
+		{60A859DD-2755-4959-95B5-AC378B76FD78}.Release|Win32.Build.0 = Release|Win32
+		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Debug|Win32.Build.0 = Debug|Win32
+		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Release|Win32.ActiveCfg = Release|Win32
+		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

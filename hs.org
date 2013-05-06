@@ -1,0 +1,21 @@
+* Decodeknownargument说明
+extc int     cdecl Decodeknownargument(ulong addr,uchar *arg,ulong value,
+               int valid,char *s,char *mask,uchar *pset[]);
+ - addr 地址
+ - arg 字符串
+ - value 值，要看valid是有否有效
+ - valid 决定是否显示值
+ - s 最后显示的字符串
+ - mask s的mask一般是0x01
+ - pset 好像一直是0
+
+004092D4 这里是win api的存储释放地方
+00126EC8   0012B2FC  |Arg1 = 0012B2FC ASCII "D:\green\odbg110\common.arg"
+
+* map解析算法
+这里只对vc生成的作说明，IDA生成的应该包括其内
+参考[[D:\src\TSM\TSM\Common\VNC\vncviewer\Debug\vncviewer.map][vncviewer.map]]
+先把所有0001或者0002的段说明归到一起，首个Name不含$的，并且Length不等于0的就是该0001的编译成exe后的节名
+* map 中c++名解析
+imagehlp.dll
+UnDecorateSymbolName
