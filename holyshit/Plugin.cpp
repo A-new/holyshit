@@ -25,15 +25,15 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
 }
 
 
-//void  ODBG_Pluginmainloop(DEBUG_EVENT *debugevent) 
-//{
-//    hook_DRAWFUNC_cpudasm();
-//    if (debugevent)
-//    {
-//        DWORD dw = debugevent->dwDebugEventCode;
-//        dw = 2;
-//    }
-//}
+void  ODBG_Pluginmainloop(DEBUG_EVENT *debugevent) 
+{
+    hook_DRAWFUNC_cpudasm();
+    //if (debugevent)
+    //{
+    //    DWORD dw = debugevent->dwDebugEventCode;
+    //    dw = 2;
+    //}
+}
 
 int ODBG_Pluginmenu(int origin,char data[4096],void *item)
 {
