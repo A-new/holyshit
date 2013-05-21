@@ -22,7 +22,7 @@ t_dump *sdk_Getcpudisasmdump();
 #define Findname(addr, type, name) FindnameW(addr, type, name, TEXTLEN)
 typedef t_sorthdr t_sortheader;
 #define BAR_NOSORT 0
-#define Browsefilename(t, n, d, m) Browsefilename(t, n, 0, 0, d, hwollymain, m);
+#define Browsefilename(t, n, d, m) Browsefilename(t, n, 0, 0, d, hwollymain, m)
 #else // od1
 #define DRAW_VARWIDTH 0
 #endif

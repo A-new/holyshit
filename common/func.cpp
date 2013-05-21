@@ -1,6 +1,6 @@
 #include "func.h"
 #include "../sdk/sdk.h"
-
+#include "map.h"
 
 DWORD GetCurrentEIP(void)
 {
@@ -30,70 +30,24 @@ void LoadMap()
     
     if (_tcsicmp(path, _T(".\\")) == 0)        //just a litle check
         return;
-#ifdef _UNICODE
-#define tfopen _wfopen
-#define tfgets fgetws
-#else
-#define tfopen fopen
-#define tfgets fgets
-#endif
-    FILE *in;
-    TCHAR mapseg[8];
-    TCHAR mapline[TEXTLEN];
-    TCHAR mapoff[] = "0x12345678\0";
-    TCHAR *endptr;
-    TCHAR *str2;
-    TCHAR maplabel[50];
-    t_module *pmodule;
+    
+    CMap c(path);
+    CMap::line_iterator ci = c.begin();
 
-    int i,j, addmenuid, mnuitems;
-    long lnumber;
-
-    if ((in = tfopen(path, _T("rt"))) == NULL)
-        Addtolist (0, 1, _T("MapConv ERROR: Cannot open %s"), path);
-    else
+    for (; ci != c.end(); ++ci)
     {
-        while (!feof(in))
-        {
-            _tcscpy(mapseg, " 0001:");
-            if ((_tcsstr(mapline, mapseg) != NULL) && (_tcsstr(mapline, "CODE") == NULL) && (_tcsstr(mapline, "Program entry") == NULL))
-            {
-                str2 = mapoff;
-                str2++;
-                str2++;
-                for (i=6;i<14;i++)
-                    *str2++ = mapline[i];
+        std::tstring s = *ci;
+        s = _T("123");
+    }
 
-                *str2++ = '\0';
-
-                str2 = maplabel;
-                j = strlen(mapline)-1;
-                for (i=0x15;i<j;i++)
-                    *str2++ = mapline[i];
-
-                *str2++ = '\0';
-                lnumber = strtol(mapoff, &endptr, 16);
-
-                pmodule = Findmodule((ulong)GetCurrentEIP());
-
-                if (what == 0)
-                    Insertname(pmodule->codebase + lnumber , NM_LABEL, maplabel);
-                else
-                    Insertname(pmodule->codebase + lnumber , NM_COMMENT, maplabel);
-
-            };
-            tfgets(mapline, TEXTLEN, in);
-        };
-        fclose(in);
         //if (what == 0) {
         //    Addtolist(0, 0, _T("MapConv: OK: Map file successfuly imported - labels updated"));
         //}
         //else  {
         //    Addtolist(0, 0, _T("MapConv: OK: Map file successfuly imported - comments updated"));
         //}
-    };
 
-    Setcpu(0,0,0,0,CPU_ASMFOCUS);
+    //Setcpu(0,0,0,0,CPU_ASMFOCUS);
 
 }
 
@@ -106,4 +60,66 @@ bool HasDebuggee()
     procHandle = process;
 #endif
     return (procHandle != NULL);
+}
+
+
+
+BOOL InjectIt(HANDLE hrp, LPCSTR DllPath/*, const DWORD dwRemoteProcessld*/)//注入主函数
+{
+    //HANDLE hrp = NULL;
+
+    //if((hrp=OpenProcess(PROCESS_CREATE_THREAD|//允许远程创建线程
+    //    PROCESS_VM_OPERATION|//允许远程VM操作
+    //    PROCESS_VM_WRITE,//允许远程VM写
+    //    FALSE,dwRemoteProcessld)) == NULL)
+    //{
+    //    // OpenProcess Error
+    //    return FALSE;
+    //}
+
+    LPTSTR psLibFileRemote = NULL;
+
+    //使用VirtualAllocEx函数在远程进程的内存地址空间分配DLL文件名缓冲
+    psLibFileRemote=(LPTSTR)VirtualAllocEx(hrp, NULL, lstrlenA(DllPath)+1,
+        MEM_COMMIT, PAGE_READWRITE);
+
+    if(psLibFileRemote == NULL)
+    {
+        // VirtualAllocEx Error
+        return FALSE;
+    }
+
+    //使用WriteProcessMemory函数将DLL的路径名复制到远程的内存空间
+    if(WriteProcessMemory(hrp, psLibFileRemote, (void *)DllPath, lstrlenA(DllPath)+1, NULL) == 0)
+    {
+        // WriteProcessMemory Error
+        return FALSE;
+    }
+
+    //计算LoadLibraryA的入口地址
+    PTHREAD_START_ROUTINE pfnStartAddr=(PTHREAD_START_ROUTINE)
+        GetProcAddress(GetModuleHandle(TEXT("Kernel32")),"LoadLibraryA");
+
+    if(pfnStartAddr == NULL)
+    {
+        // GetProcAddress Error!
+        return FALSE;
+    }
+    //pfnStartAddr地址就是LoadLibraryA的入口地址
+
+
+    HANDLE hrt = NULL;
+
+    if((hrt = CreateRemoteThread(hrp,
+        NULL,
+        0,
+        pfnStartAddr,
+        psLibFileRemote,
+        0,
+        NULL)) == NULL)
+    {
+        // CreateRemote Error
+        return FALSE;
+    }
+    return TRUE;
 }

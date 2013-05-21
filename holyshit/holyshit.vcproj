@@ -231,6 +231,14 @@
 				RelativePath="..\common\hook.h"
 				>
 			</File>
+			<File
+				RelativePath="..\common\map.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\map.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

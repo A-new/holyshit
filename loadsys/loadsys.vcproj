@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="od2"
-	ProjectGUID="{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}"
-	RootNamespace="od2"
+	Name="loadsys"
+	ProjectGUID="{B6B0BD04-7FC1-4F45-A705-6CA922F98504}"
+	RootNamespace="loadsys"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,11 +41,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;OD2_EXPORTS;BOOST_SPIRIT_UNICODE;BOOST_SPIRIT_UNICODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;LOADSYS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				DefaultCharIsUnsigned="true"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -61,9 +60,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="D:\green\od2\plugins\HolyShitd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -117,10 +115,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;OD2_EXPORTS"
-				RuntimeLibrary="2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LOADSYS_EXPORTS"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -137,11 +134,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
 				TargetMachine="1"
 			/>
 			<Tool
@@ -176,19 +174,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\common\func.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\map.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\plugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\sdk.cpp"
+				RelativePath=".\main.cpp"
 				>
 			</File>
 		</Filter>
@@ -198,35 +184,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\common\detours.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\func.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\map.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\Plugin110.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\plugin2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\sdk.h"
+				RelativePath=".\myntdll.h"
 				>
 			</File>
 		</Filter>
@@ -236,10 +194,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\common\detours_x86.lib"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

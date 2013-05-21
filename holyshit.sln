@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "holyshit", "holyshit\holysh
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "od2", "od2\od2.vcproj", "{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loadsys", "loadsys\loadsys.vcproj", "{B6B0BD04-7FC1-4F45-A705-6CA922F98504}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Debug|Win32.Build.0 = Debug|Win32
 		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Release|Win32.ActiveCfg = Release|Win32
 		{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}.Release|Win32.Build.0 = Release|Win32
+		{B6B0BD04-7FC1-4F45-A705-6CA922F98504}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B6B0BD04-7FC1-4F45-A705-6CA922F98504}.Debug|Win32.Build.0 = Debug|Win32
+		{B6B0BD04-7FC1-4F45-A705-6CA922F98504}.Release|Win32.ActiveCfg = Release|Win32
+		{B6B0BD04-7FC1-4F45-A705-6CA922F98504}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
