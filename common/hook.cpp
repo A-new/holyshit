@@ -4,13 +4,12 @@
 #include "../sdk/sdk.h"
 
 
-LONG WINAPI hook( PVOID *ppPointer, PVOID pDetour )
+void hook( PVOID *ppPointer, PVOID pDetour )
 {
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     DetourAttach(ppPointer, pDetour);
     DetourTransactionCommit();
-    return 0;
 }
 
 
@@ -61,7 +60,6 @@ int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(cha
     return DRAWFUNC_cpudasm(s, (uchar*)mask, select, 0, ps, column, 0);
 }
 #endif
-
 
 class CHookOnce
 {
@@ -215,49 +213,148 @@ void hook_CreateProcessInternalW()
 
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-PVOID Org00477754 = (PVOID)0x00477754; // od1.10
-void __declspec(naked) My00477754()
+#ifdef HOLYSHIT_EXPORTS
+PVOID OrgDllCheck = (PVOID)0x00477754; // od1.10
+#else
+PVOID OrgDllCheck = (PVOID)0x0044BFCE; // od2
+#endif
+PVOID OrgDllCheck2 = (PVOID)0x0045825C; // only for od2
+
+
+bool IsSysFile(const TCHAR* DllPath)
 {
-    static const char* ebp08;
+    const TCHAR* p;
+    p = _tcsrchr(DllPath, '.');
+    if (p)
+    {
+        if (0 == StrCmpNI(p, _T(".sys"), 4))
+        {
+            return true;
+            // *change =  1;
+        }
+    }
+
+    p = _tcsrchr(DllPath, _T('\\')) ;
+    if (p)
+    {
+        p += 1;
+
+        if (0 == _tcsicmp(p, _T("ntoskrnl.exe")))
+        {
+            return true;
+            //*change =  1;
+        }
+    }
+    return false;
+}
+void __declspec(naked) MyDllCheck()
+{
+    static const TCHAR* DllPath;
     static DWORD* change;
     __asm{
         push eax
         mov eax, dword ptr [ebp + 0x08]
-        mov ebp08, eax
-        lea eax, dword ptr [ebp - 0x8]
+        mov DllPath, eax
+#ifdef HOLYSHIT_EXPORTS
+        lea eax, dword ptr [ebp - 0x08]
+#else
+        lea eax, dword ptr [ebp - 0x0C]
+#endif
         mov change, eax
         pop eax
         pushad
         pushfd
     }
-    static const char* p;
-    p = strrchr(ebp08, '.');
-    if (p)
+    if (IsSysFile(DllPath))
     {
-        if (0 == StrCmpNIA(p, ".sys", 4))
-        {
-            *change =  1;
-        }
+        *change = 1;
     }
 
-    p = strrchr(ebp08, '\\') ;
-    if (p)
+    __asm{
+        popfd
+        popad
+        jmp OrgDllCheck
+    }
+}
+
+void __declspec(naked) MyDllCheck2()
+{
+    static const TCHAR* DllPath;
+    
+    __asm{
+        push eax
+        mov eax, dword ptr [esp + 0x4]
+        mov DllPath, eax
+        pop eax
+        pushad
+        pushfd
+    }
+
+    if (IsSysFile(DllPath))
     {
-        p += 1;
-        if (0 == stricmp(p, "ntoskrnl.exe"))
-        {
-            *change =  1;
+        __asm{
+            mov eax, 1
         }
     }
 
     __asm{
         popfd
         popad
-        jmp Org00477754
+        jmp OrgDllCheck2
     }
 }
 
-void hook_00477754()
+void hook_DllCheck()
 {
-    hook(&(PVOID&)Org00477754, My00477754);
+    hook(&(PVOID&)OrgDllCheck, MyDllCheck);
+#ifndef HOLYSHIT_EXPORTS // only for od2
+    hook(&(PVOID&)OrgDllCheck2, MyDllCheck2);
+#endif
 }
+
+
+static DWORD g_value;
+static DWORD g_set;
+PVOID Org0040869C = (PVOID)0x0040869C; // od1.10
+void __declspec(naked) My0040869C()
+{
+    /*Gettextxy*/
+    __asm
+    {
+        jmp Org0040869C;
+    }
+}
+void hook_0040869C()
+{
+    hook(&(PVOID&)Org0040869C, My0040869C);
+
+}
+
+
+PVOID Org00439191 = (PVOID)0x00439191; // od1.10
+void __declspec(naked) My00439191()
+{
+    __asm
+    {
+        jmp Org00439191;
+    }
+}
+void hook_00439191()
+{
+    hook(&(PVOID&)Org00439191, My00439191);
+
+}
+
+#ifdef HOLYSHIT_EXPORTS // od1
+typedef int (cdecl *SETHARDWAREBREAKPOINT)(ulong addr,int size,int type);
+
+SETHARDWAREBREAKPOINT Sethardwarebreakpoint_Org = Sethardwarebreakpoint;
+int cdecl Sethardwarebreakpoint_hook(ulong addr,int size,int type)
+{
+    return Sethardwarebreakpoint_Org(addr, size, type);
+}
+void hook_Sethardwarebreakpoint()
+{
+    hook(&(PVOID&)Sethardwarebreakpoint_Org, Sethardwarebreakpoint_hook);
+}
+#endif

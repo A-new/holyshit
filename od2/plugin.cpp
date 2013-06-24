@@ -1,10 +1,14 @@
 #include "../sdk/sdk.h"
 #include "../common/hook.h"
 #include "../common/func.h"
+#include "../common/toolbar.h"
 
 extc int __cdecl ODBG2_Plugininit(void) 
 {
     hook_DRAWFUNC_cpudasm();
+    hook_DllCheck();
+    if(CToolbar_Global.init("D:\\src\\vc\\holyshit\\common\\test.ini"))
+        CToolbar_Global.attach(hwollymain);
 
     return 0;
 }
@@ -50,4 +54,25 @@ extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
         // Main menu.
         return mainmenu;
     return NULL;
+}
+
+bool bInjected = false;
+void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent)
+{
+    if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
+    {
+        bInjected = false;
+    }
+}
+
+void  ODBG2_Pluginanalyse(t_module *pmod)
+{
+    //Run(STAT_RUNNING, 0);
+     Resumeallthreads();
+    //Sendshortcut(PM_MAIN, 0, WM_KEYDOWN, 0, 1, VK_F9); 
+    if (pmod)
+    {
+    wchar_t* p = pmod->modname; 
+    p = pmod->path;
+    }
 }

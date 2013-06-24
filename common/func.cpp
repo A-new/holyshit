@@ -1,6 +1,6 @@
 #include "func.h"
 #include "../sdk/sdk.h"
-#include "map.h"
+//#include "map.h"
 
 DWORD GetCurrentEIP(void)
 {
@@ -31,14 +31,14 @@ void LoadMap()
     if (_tcsicmp(path, _T(".\\")) == 0)        //just a litle check
         return;
     
-    CMap c(path);
-    CMap::line_iterator ci = c.begin();
+    //CMap c(path);
+    //CMap::line_iterator ci = c.begin();
 
-    for (; ci != c.end(); ++ci)
-    {
-        std::tstring s = *ci;
-        s = _T("123");
-    }
+    //for (; ci != c.end(); ++ci)
+    //{
+    //    std::tstring s = *ci;
+    //    s = _T("123");
+    //}
 
         //if (what == 0) {
         //    Addtolist(0, 0, _T("MapConv: OK: Map file successfuly imported - labels updated"));

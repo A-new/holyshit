@@ -136,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\xInOne1.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
 				GenerateDebugInformation="true"
@@ -237,6 +238,14 @@
 			</File>
 			<File
 				RelativePath="..\common\map.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\toolbar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\toolbar.h"
 				>
 			</File>
 		</Filter>

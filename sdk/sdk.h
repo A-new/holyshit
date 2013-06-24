@@ -17,6 +17,7 @@
 
 
 t_dump *sdk_Getcpudisasmdump();
+t_dump * sdk_Getmodulesdump();
 
 #ifndef HOLYSHIT_EXPORTS // od2
 #define Findname(addr, type, name) FindnameW(addr, type, name, TEXTLEN)

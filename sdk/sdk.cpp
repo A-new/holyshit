@@ -14,3 +14,14 @@ t_dump * sdk_Getcpudisasmdump()
     return Getcpudisasmdump();
 #endif
 }
+
+// Alt + E ´°¿Ú
+t_dump * sdk_Getmodulesdump()
+{
+#ifdef HOLYSHIT_EXPORTS // od110
+    return (t_dump*)Plugingetvalue(VAL_MODULES);
+#else
+    return NULL;//Getcpudisasmdump();
+#endif
+}
+
