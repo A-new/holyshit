@@ -3,30 +3,47 @@
 #include "../common/func.h"
 #include "../common/toolbar.h"
 
+extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
+                                   wchar_t pluginname[SHORTNAME],wchar_t pluginversion[SHORTNAME]) 
+{
+    if (ollydbgversion != 201)
+        return 0;
+
+    wcscpy(pluginname, PLUGIN_NAME);       // Name of plugin
+    wcscpy(pluginversion, L"003");       // Version of plugin
+    return PLUGIN_VERSION;               // Expected API version
+};
+
 extc int __cdecl ODBG2_Plugininit(void) 
 {
-    hook_DRAWFUNC_cpudasm();
+    int width_label = DEFAULT_WIDTH_LABEL;
+    int width_comment = DEFAULT_WIDTH_COMMENT;
+    Getfromini(NULL, PLUGIN_NAME, WIDTH_LABEL, L"%i", &width_label);
+    Getfromini(NULL, PLUGIN_NAME, WIDTH_COMMENT, L"%i", &width_comment);
+    set_width_label(width_label);
+    set_width_comment(width_comment);
+
+    hook_DRAWFUNC_cpudasm(); // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加
     hook_DllCheck();
+
     if(CToolbar_Global.init("D:\\src\\vc\\holyshit\\common\\test.ini"))
         CToolbar_Global.attach(hwollymain);
 
     return 0;
 }
 
-// 至少要有这个函数
-extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
-                                   wchar_t pluginname[SHORTNAME],wchar_t pluginversion[SHORTNAME]) 
+int ODBG2_Pluginclose(void)
 {
-    // Check whether OllyDbg has compatible version. This plugin uses only the
-    // most basic functions, so this check is done pro forma, just to remind of
-    // this option.
-    if (ollydbgversion<201)
-        return 0;
-    // Report name and version to OllyDbg.
-    wcscpy(pluginname, L"HolyShit");       // Name of plugin
-    wcscpy(pluginversion,L"002");       // Version of plugin
-    return PLUGIN_VERSION;               // Expected API version
-};
+    int i = get_width_label();
+    if(i)
+        Writetoini(NULL, PLUGIN_NAME, WIDTH_LABEL, L"%i", i);
+    i = get_width_comment();
+    if(i)
+        Writetoini(NULL, PLUGIN_NAME, WIDTH_COMMENT, L"%i", i);
+    return 0;
+}
+
+
 
 static int MloadMap(t_table *pt,wchar_t *name,ulong index,int mode)
 {
@@ -39,13 +56,14 @@ static int MloadMap(t_table *pt,wchar_t *name,ulong index,int mode)
     };
     return MENU_ABSENT;
 }
+
 static t_menu mainmenu[] = {
     { L"load map file..",
     L"load map file ,which maybe from IDA or dede",
     K_NONE, MloadMap, NULL, 0 },
-    //{ L"odhs plugin v0.1",
-    //L"About odhs plugin",
-    //K_NONE, Mabout, NULL, 0 }
+    { L"odhs plugin v0.1",
+    L"About odhs plugin",
+    K_NONE, MloadMap, NULL, 0 },
     { NULL, NULL, K_NONE, NULL, NULL, 0 }
 };
 extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
@@ -59,6 +77,7 @@ extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
 bool bInjected = false;
 void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent)
 {
+    hook_DRAWFUNC_cpudasm();
     if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
     {
         bInjected = false;

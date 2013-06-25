@@ -2,7 +2,10 @@
 #include <windows.h>
 #include "detours.h"
 #include "../sdk/sdk.h"
+#include <boost/thread/mutex.hpp>
 
+int width_label;
+int width_comment;
 
 void hook( PVOID *ppPointer, PVOID pDetour )
 {
@@ -61,43 +64,65 @@ int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(cha
 }
 #endif
 
-class CHookOnce
-{
-public:
-    CHookOnce()
-    {
-        t_dump *td = sdk_Getcpudisasmdump();
-        t_table *p = &td->table;
-        if (p)
-        {
-            t_bar* tb = &p->bar;
-            tb->nbar = 5;
+//typedef void    (cdecl *DEFAULTBAR)(t_bar *pb);
+//DEFAULTBAR OrgDefaultbar;
+//void cdecl MyDefaultbar(t_bar *pb)
+//{
+//    OrgDefaultbar(pb);
+//}
+//void hook_Defaultbar()
+//{
+//    HMODULE hMod = GetModuleHandle(NULL);
+//    //int temp = (int)&;
+//    OrgDefaultbar = (DEFAULTBAR)GetProcAddress(hMod, "_Defaultbar");
+//    hook(&(PVOID&)OrgDefaultbar, MyDefaultbar);
+//}
 
-            tb->name[COLUMN_LABELS] = _T("Label");
-            tb->mode[COLUMN_LABELS] = BAR_NOSORT;
-            tb->defdx[COLUMN_LABELS] = 100;
-            tb->dx[COLUMN_LABELS] = 100;
-
-            tb->defdx[3] = 200;
-            tb->dx[3] = 200;
-
-            g_func = p->drawfunc;
-
-#ifdef HOLYSHIT_EXPORTS
-            hook(&(PVOID&)g_func, MyDRAWFUNC);
-#else // od2
-            hook(&(PVOID&)g_func, DRAWFUNC_cpudasm);
-#endif
-
-            InvalidateRect(p->hw, NULL, TRUE);
-
-        }
-    }
-};
+extern int width_label;
+extern int width_comment;
 
 void hook_DRAWFUNC_cpudasm()
 {
-    static CHookOnce a;
+    static boost::mutex mu;
+    static bool hooked = false;
+    if (!hooked)
+    {
+        boost::mutex::scoped_lock lLock(mu);
+        if (!hooked)
+        {
+            t_dump *td = sdk_Getcpudisasmdump();
+            t_table *p = &td->table;
+            if (p && p->hw)
+            {
+                t_bar* tb = &p->bar;
+                tb->nbar = 5;
+
+                tb->name[COLUMN_LABELS] = _T("Label");
+                tb->mode[COLUMN_LABELS] = BAR_NOSORT;
+
+                int size_font = tb->dx[2] / tb->defdx[2];
+                tb->defdx[COLUMN_LABELS] = width_label / size_font; // 字符串长度，需要重新计算，否则后面调用Defaultbar会显示不正常
+                tb->dx[COLUMN_LABELS] = width_label;
+
+                tb->defdx[3] = width_comment / size_font;
+                tb->dx[3] = width_comment;
+
+                g_func = p->drawfunc;
+
+#ifdef HOLYSHIT_EXPORTS
+                hook(&(PVOID&)g_func, MyDRAWFUNC);
+#else // od2
+                hook(&(PVOID&)g_func, DRAWFUNC_cpudasm);
+#endif
+
+                InvalidateRect(p->hw, NULL, TRUE);
+                hooked = true;
+
+                //hook_Defaultbar();
+            }
+        }
+    }
+
 }
 
 typedef
@@ -218,7 +243,7 @@ PVOID OrgDllCheck = (PVOID)0x00477754; // od1.10
 #else
 PVOID OrgDllCheck = (PVOID)0x0044BFCE; // od2
 #endif
-PVOID OrgDllCheck2 = (PVOID)0x0045825C; // only for od2
+PVOID OrgDllCheck2 = (PVOID)0x00458257; // only for od2
 
 
 bool IsSysFile(const TCHAR* DllPath)
@@ -277,31 +302,48 @@ void __declspec(naked) MyDllCheck()
     }
 }
 
+BOOL __cdecl Mycompare(const TCHAR* DllPath, const TCHAR* r)
+{
+    if(IsSysFile(DllPath))
+    {
+        return 1;
+    }
+    return 0;
+}
 void __declspec(naked) MyDllCheck2()
 {
-    static const TCHAR* DllPath;
-    
-    __asm{
-        push eax
-        mov eax, dword ptr [esp + 0x4]
-        mov DllPath, eax
-        pop eax
-        pushad
-        pushfd
-    }
-
-    if (IsSysFile(DllPath))
+    __asm
     {
-        __asm{
-            mov eax, 1
-        }
+        call Mycompare;
+        test eax,eax;
+        je l1
+        ADD DWORD PTR [ESP],0x2 // 跟原call一样，居然修改参数
+l1:
+        jmp OrgDllCheck2;
     }
+    //static const TCHAR* DllPath;
+    //
+    //__asm{
+    //    push eax
+    //    mov eax, dword ptr [esp + 0x4]
+    //    mov DllPath, eax
+    //    pop eax
+    //    pushad
+    //    pushfd
+    //}
 
-    __asm{
-        popfd
-        popad
-        jmp OrgDllCheck2
-    }
+    //if (IsSysFile(DllPath))
+    //{
+    //    __asm{
+    //        mov eax, 1
+    //    }
+    //}
+
+    //__asm{
+    //    popfd
+    //    popad
+    //    jmp OrgDllCheck2
+    //}
 }
 
 void hook_DllCheck()
@@ -358,3 +400,50 @@ void hook_Sethardwarebreakpoint()
     hook(&(PVOID&)Sethardwarebreakpoint_Org, Sethardwarebreakpoint_hook);
 }
 #endif
+
+int get_width_label()
+{
+    t_dump *td = sdk_Getcpudisasmdump();
+    if (td)
+    {
+        t_table *p = &td->table;
+        if (p)
+        {
+            t_bar* tb = &p->bar;
+            if (tb && tb->nbar == 5)
+            {
+                return tb->dx[COLUMN_LABELS];
+            }
+        }
+    }
+    return 0;
+}
+
+int get_width_comment()
+{
+    t_dump *td = sdk_Getcpudisasmdump();
+    if (td)
+    {
+        t_table *p = &td->table;
+        if (p)
+        {
+            t_bar* tb = &p->bar;
+            if (tb && tb->nbar == 5)
+            {
+                return tb->dx[3];
+            }
+        }
+    }
+    return 0;
+}
+
+void set_width_label(int i)
+{
+    width_label = i;
+}
+
+void set_width_comment(int i)
+{
+    width_comment = i;
+}
+

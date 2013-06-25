@@ -36,6 +36,7 @@ protected:
         LPARAM lParam,
         bool lbtn_up = false);
     void destory();
+    CToolbar();
     ~CToolbar();
     static LRESULT CALLBACK WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     void draw_internal(HDC hDC, int x, HBITMAP handle, HPEN hpen1, HPEN hpen2);

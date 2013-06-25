@@ -6,15 +6,25 @@
 
 extc int  _export cdecl ODBG_Plugindata(char shortname[32])
 {
-    strcpy(shortname, "HolyShit");
+    strcpy(shortname, PLUGIN_NAME);
     return PLUGIN_VERSION;
 }
 
-
 HWND g_ollyWnd;
+HMODULE g_hModule;
+
 extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
                                         ulong *features)
 {
+    if (ollydbgversion != 110)
+    {
+        return -1;
+    }
+    int width_label = Pluginreadintfromini(g_hModule, WIDTH_LABEL, DEFAULT_WIDTH_LABEL);
+    int width_comment = Pluginreadintfromini(g_hModule, WIDTH_COMMENT, DEFAULT_WIDTH_COMMENT);
+    set_width_label(width_label);
+    set_width_comment(width_comment);
+
     g_ollyWnd = hw;
     if(CToolbar_Global.init("D:\\src\\vc\\holyshit\\common\\test.ini"))
         CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
@@ -32,6 +42,13 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
 }
 
 
+
+int cdecl ODBG_Pluginclose(void)
+{
+    Pluginwriteinttoini(g_hModule, WIDTH_LABEL, get_width_label());
+    Pluginwriteinttoini(g_hModule, WIDTH_COMMENT, get_width_comment());
+    return 0;
+}
 
 
 int ODBG_Pluginmenu(int origin,char data[4096],void *item)
@@ -86,7 +103,7 @@ void ODBG_Pluginaction(int origin,int action,void *item)
 //
 //}
 
-HMODULE g_hModule;
+
 
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")

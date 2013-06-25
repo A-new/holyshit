@@ -62,11 +62,21 @@ CToolbar::~CToolbar()
 {
     destory();
 }
+CToolbar::CToolbar()
+: m_pen(0)
+{
 
+}
 void CToolbar::destory()
 {
-    SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)m_prevProc);
-    DeleteObject(m_pen);
+    if (m_prevProc)
+    {
+        SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)m_prevProc);
+    }
+    if (m_pen)
+    {
+        DeleteObject(m_pen);
+    }
     std::vector<BMP_DATA>::const_iterator ci = m_bmp.begin();
     for (; ci != m_bmp.end(); ++ci)
     {
@@ -251,6 +261,8 @@ std::vector<BMP_DATA>::const_iterator CToolbar::at( int x, int y )
     }
     return m_bmp.end();
 }
+
+
 
 
 
