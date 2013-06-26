@@ -6,7 +6,7 @@ OD2->holyshit201.dll
 
 
 changelog:
-2013年6月25日 v0.3，增加toolbar(不兼容IDAFicator)，label显示bug修正，OD201H全功能同步更新
+2013年6月25日 v0.3，增加toolbar(不兼容IDAFicator)，label添加导出函数名显示以及bug修正，OD201H全功能同步发布
 
 2013年5月3日 v0.2，label显示为高亮包
 

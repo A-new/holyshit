@@ -3,6 +3,8 @@
 #include "../sdk/sdk.h"
 //#include <boost/>
 
+// 0x4CDA2D 表示鼠标点击的当前地址
+// 还有个是点击外的下一行地址
 struct Mydata
 {
     HWND hFind;

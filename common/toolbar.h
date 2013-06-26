@@ -7,6 +7,9 @@
 
 #define INI_PATH TEXT("toolbar_ini")
 
+#pragma pack(1) // fuck!因为OD SDK强制使用了pack，必须加句，否则其他使用如CConfig_Single去地方，跟plugin110.cpp里的不一样，
+// 会出现你不能发现的问题，如string莫名其妙崩溃，release编译会有warning C4742警告，千万不要忽略！
+
 struct TOOLBAR_ITEM
 {
     // handle, cmd

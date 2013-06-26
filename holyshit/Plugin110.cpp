@@ -6,6 +6,7 @@
 #include "../common/toolbar.h"
 #include "../common/loadsys.h"
 #include "../common/label.h"
+#include "../common/config.h"
 #include <Shlwapi.h>
 
 extc int  _export cdecl ODBG_Plugindata(char shortname[32])
@@ -24,28 +25,19 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
         return -1;
     }
     g_ollyWnd = hw;
+    CConfig_Single.set_mod(g_hModule);
+    CConfig_Single.loadall();
 
-    // label相关初始化
-    int width_label = Pluginreadintfromini(g_hModule, WIDTH_LABEL, DEFAULT_WIDTH_LABEL);
-    int width_comment = Pluginreadintfromini(g_hModule, WIDTH_COMMENT, DEFAULT_WIDTH_COMMENT);
-    set_width_label(width_label);
-    set_width_comment(width_comment);
     //hook_DRAWFUNC_cpudasm放到mainloop里去做，因为在此处CPUDASM还没有创建起来
-
     // loadsys相关初始化
     hook_loadsys_functions();
 
     // toolbar相关初始化
-    char szTB[MAX_PATH];
-    Pluginreadstringfromini(g_hModule, INI_PATH, szTB, "");
-    if (PathFileExistsA(szTB))
+    std::tstring szTB = CConfig_Single.get_ini_path();
+    if (PathFileExistsA(szTB.c_str()))
     {
-        if(CToolbar_Global.init(szTB))//"D:\\src\\vc\\holyshit\\common\\test.ini"
+        if(CToolbar_Global.init(szTB.c_str()))//"D:\\src\\vc\\holyshit\\common\\test.ini"
             CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
-    }
-    else
-    {
-        Pluginwritestringtoini(g_hModule, INI_PATH, "");
     }
 
     //hook_CreateProcessInternalW();
@@ -59,9 +51,9 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
 
 void cdecl ODBG_Plugindestroy(void)
 {
-    Pluginwriteinttoini(g_hModule, WIDTH_LABEL, get_width_label());
-    Pluginwriteinttoini(g_hModule, WIDTH_COMMENT, get_width_comment());
+    CConfig_Single.saveall(true);
 }
+
 // ODBG_Pluginclose是可以被撒消的
 int cdecl ODBG_Pluginclose(void)
 {

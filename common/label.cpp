@@ -2,17 +2,39 @@
 #include "../sdk/sdk.h"
 #include "hook.h"
 #include <boost/thread/mutex.hpp>
+#include "config.h"
 
 DRAWFUNC *g_func;
-int width_label;
-int width_comment;
-
 
 #define COLUMN_LABELS 4
 int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
 {
-    if (column == COLUMN_LABELS)
+    int col = 3;
+    if (CConfig_Single.label_enabled())
     {
+        col = COLUMN_LABELS;
+    }
+    if (column == col)
+    {
+        int itest = 0;
+        // 先检查原来的有没有
+        if (!CConfig_Single.label_enabled())
+        {
+#ifdef HOLYSHIT_EXPORTS
+            itest = g_func(s, (char*)mask, select, ps, column);
+#else
+            itest = g_func(s, mask, select, pt, ps, column, cache);
+#endif
+            if (itest)
+            {
+                //有个问题会出现N，但是并没有显示，后面要修复！
+                if (itest != 1 && *s != TEXT('N'))
+                {
+                    return itest;
+                }
+            }
+        }
+
         t_dump *p = sdk_Getcpudisasmdump();
         ulong addr = 0;
 
@@ -27,11 +49,25 @@ int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sorthea
 
         if (addr)
         {
-            int len = Findname(addr, NM_LABEL, s);
-            if (len)
+            const std::vector<int>& vCheck = CConfig_Single.check();
+            
+            int len = 0;
+            for (size_t i=0; i<vCheck.size(); ++i)
             {
-                memset(mask, DRAW_HILITE, len);
-                *select = DRAW_MASK | DRAW_VARWIDTH;
+                len = Findname(addr, vCheck[i], s); // 获取label
+                if (len)
+                {
+                    memset(mask, DRAW_HILITE, len);
+                    //*select = DRAW_MASK | DRAW_VARWIDTH; // 不加上也可以，加上的话选不中
+                    break;
+                }
+            }
+
+            // patch
+            if (!len && itest == 1)
+            {
+                *s = TEXT('N');
+                return itest;
             }
             return len;
         }
@@ -81,18 +117,24 @@ void hook_label_functions()
             t_table *p = &td->table;
             if (p && p->hw)
             {
-                t_bar* tb = &p->bar;
-                tb->nbar = 5;
+                if (CConfig_Single.label_enabled())
+                {
+                    t_bar* tb = &p->bar;
+                    tb->nbar = 5;
 
-                tb->name[COLUMN_LABELS] = _T("Label");
-                tb->mode[COLUMN_LABELS] = BAR_NOSORT;
+                    tb->name[COLUMN_LABELS] = _T("Label");
+                    tb->mode[COLUMN_LABELS] = BAR_NOSORT;
 
-                int size_font = tb->dx[2] / tb->defdx[2];
-                tb->defdx[COLUMN_LABELS] = width_label / size_font; // 字符串长度，需要重新计算，否则后面调用Defaultbar会显示不正常
-                tb->dx[COLUMN_LABELS] = width_label;
+                    int size_font = tb->dx[2] / tb->defdx[2];
+                    tb->defdx[COLUMN_LABELS] = CConfig_Single.get_width_label() / size_font; // 字符串长度，需要重新计算，否则后面调用Defaultbar会显示不正常
+                    tb->dx[COLUMN_LABELS] = CConfig_Single.get_width_label();
 
-                tb->defdx[3] = width_comment / size_font;
-                tb->dx[3] = width_comment;
+                    tb->defdx[3] = CConfig_Single.get_width_comment() / size_font;
+                    tb->dx[3] = CConfig_Single.get_width_comment();
+
+                    InvalidateRect(p->hw, NULL, TRUE);
+
+                }
 
                 g_func = p->drawfunc;
 
@@ -102,9 +144,7 @@ void hook_label_functions()
                 hook(&(PVOID&)g_func, DRAWFUNC_cpudasm);
 #endif
 
-                InvalidateRect(p->hw, NULL, TRUE);
                 hooked = true;
-
                 //hook_Defaultbar();
             }
         }
@@ -112,9 +152,7 @@ void hook_label_functions()
 
 }
 
-
-
-int get_width_label()
+int get_width_label_now()
 {
     t_dump *td = sdk_Getcpudisasmdump();
     if (td)
@@ -132,7 +170,7 @@ int get_width_label()
     return 0;
 }
 
-int get_width_comment()
+int get_width_comment_now()
 {
     t_dump *td = sdk_Getcpudisasmdump();
     if (td)
@@ -149,14 +187,3 @@ int get_width_comment()
     }
     return 0;
 }
-
-void set_width_label(int i)
-{
-    width_label = i;
-}
-
-void set_width_comment(int i)
-{
-    width_comment = i;
-}
-

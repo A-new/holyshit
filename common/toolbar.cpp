@@ -114,10 +114,16 @@ void CToolbar::OnLeftButtonUp(LPARAM lParam)
 {
     int xPos = GET_X_LPARAM(lParam); 
     int yPos = GET_Y_LPARAM(lParam); 
-    std::vector<TOOLBAR_ITEM>::const_iterator ci = at(xPos, yPos);
+    std::vector<TOOLBAR_ITEM>::iterator ci = at(xPos, yPos);
     if (ci != m_bmp.end())
     {
-        MessageBox(0, 0, 0,0);
+        //MessageBox(0, boost::get<1>(ci->data[ci->iStatus]).c_str(), 0,0);
+
+        ++ci->iStatus;
+        if (ci->iStatus >= ci->data.size())
+        {
+            ci->iStatus = 0;
+        }
     }
 }
 LRESULT CALLBACK CToolbar::WindowProc( HWND hwnd,
@@ -132,13 +138,18 @@ LRESULT CALLBACK CToolbar::WindowProc( HWND hwnd,
     }
     else if (uMsg == WM_LBUTTONDOWN)
     {
+        //SetCapture(hwnd); // 否则移出窗口位置就没有WM_LBUTTONUP消息了。但是OD的又不正常了
         CToolbar_Global.draw(hwnd, uMsg, wParam, lParam,true);
     }
     else if(uMsg == WM_LBUTTONUP)
     {
+        //::ReleaseCapture();
         CToolbar_Global.OnLeftButtonUp(lParam);
         SendMessageA(hwnd, WM_PAINT, 0, 0);
     }
+    //else if (uMsg == WM_CAPTURECHANGED)
+    //{
+    //}
     return CallWindowProc(m_prevProc, hwnd, uMsg, wParam, lParam);
 }
 
@@ -262,11 +273,6 @@ void CToolbar::draw(HWND hwnd,
         if (ci != m_bmp.end())
         {
             HDC hDC = GetDC(hwnd);
-            ++ci->iStatus;
-            if (ci->iStatus >= ci->data.size())
-            {
-                ci->iStatus = 0;
-            }
             HBITMAP handle = boost::get<0>(ci->data[ci->iStatus]);
             draw_internal(hDC, ci->x, handle, m_penBlack, m_penWhite);
             ReleaseDC(hwnd, hDC);

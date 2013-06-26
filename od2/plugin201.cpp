@@ -5,7 +5,11 @@
 #include "../common/loadsys.h"
 #include "../common/label.h"
 #include "../common/define.h"
+#include "../common/config.h"
 #include <Shlwapi.h>
+
+// 005CFDF8 
+// 005CFDFC 
 HMODULE g_hModule = NULL;
 extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
                                    wchar_t pluginname[SHORTNAME],wchar_t pluginversion[SHORTNAME]) 
@@ -23,32 +27,20 @@ extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
 extc int __cdecl ODBG2_Plugininit(void) 
 {
     g_ollyWnd = hwollymain;
+    CConfig_Single.loadall();
 
-    // label相关初始化
-    int width_label = DEFAULT_WIDTH_LABEL;
-    int width_comment = DEFAULT_WIDTH_COMMENT;
-    Getfromini(NULL, PLUGIN_NAME, WIDTH_LABEL, L"%i", &width_label);
-    Getfromini(NULL, PLUGIN_NAME, WIDTH_COMMENT, L"%i", &width_comment);
-    set_width_label(width_label);
-    set_width_comment(width_comment);
     hook_label_functions(); // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加
 
     // loadsys相关初始化
     hook_loadsys_functions();
 
     // toolbar相关初始化
-    WCHAR szTB[MAX_PATH];
-    Getfromini(NULL, PLUGIN_NAME, INI_PATH, L"%s", &szTB);
-    if (PathFileExistsW(szTB))
+    std::tstring szTB = CConfig_Single.get_ini_path();
+    if (PathFileExistsW(szTB.c_str()))
     {
-        std::string path = wstring2string(szTB, CP_ACP);
+        std::string path = wstring2string(szTB.c_str(), CP_ACP);
         if(CToolbar_Global.init(path))//"D:\\src\\vc\\holyshit\\common\\test.ini"
             CToolbar_Global.attach(hwollymain);
-    }
-    else
-    {
-        szTB[0] = 0;
-        Writetoini(NULL, PLUGIN_NAME, INI_PATH, L"%s", szTB);
     }
 
     return 0;
@@ -56,13 +48,9 @@ extc int __cdecl ODBG2_Plugininit(void)
 
 void ODBG2_Plugindestroy(void)
 {
-    int i = get_width_label();
-    if(i)
-        Writetoini(NULL, PLUGIN_NAME, WIDTH_LABEL, L"%i", i);
-    i = get_width_comment();
-    if(i)
-        Writetoini(NULL, PLUGIN_NAME, WIDTH_COMMENT, L"%i", i);
+    CConfig_Single.saveall(true);
 }
+
 // ODBG2_Pluginclose是可以被撒消的
 int ODBG2_Pluginclose(void)
 {
