@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\xInOne1.dll"
+				OutputFile="$(OutDir)\holyshit110.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
 				GenerateDebugInformation="true"
@@ -177,7 +177,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Plugin.cpp"
+				RelativePath="..\common\func.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\hook.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\jmpstack.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\label.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\loadsys.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugin110.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\toolbar.cpp"
 				>
 			</File>
 		</Filter>
@@ -209,6 +237,10 @@
 			Name="common"
 			>
 			<File
+				RelativePath="..\common\define.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\detours.h"
 				>
 			</File>
@@ -217,15 +249,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\func.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\common\func.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.cpp"
 				>
 			</File>
 			<File
@@ -233,7 +257,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\map.cpp"
+				RelativePath="..\common\jmpstack.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\label.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\loadsys.h"
 				>
 			</File>
 			<File
@@ -241,7 +273,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\toolbar.cpp"
+				RelativePath="..\sdk\Plugin110.h"
 				>
 			</File>
 			<File

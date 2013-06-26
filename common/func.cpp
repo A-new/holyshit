@@ -1,7 +1,9 @@
 #include "func.h"
 #include "../sdk/sdk.h"
-//#include "map.h"
+#include <shlwapi.h>
 
+//#include "map.h"
+HWND g_ollyWnd = NULL;
 DWORD GetCurrentEIP(void)
 {
     t_thread* t2;// t_thread
@@ -121,5 +123,70 @@ BOOL InjectIt(HANDLE hrp, LPCSTR DllPath/*, const DWORD dwRemoteProcessld*/)//×¢
         // CreateRemote Error
         return FALSE;
     }
+    CloseHandle(hrt);
+    //WaitForSingleObject(hrt, INFINITE);
     return TRUE;
+}
+
+void about()
+{
+    MessageBoxA(g_ollyWnd,"HolyShit v0.2\r\nCopyright (C) 2013 lynnux\r\nlynnux@qq.com"
+        "\r\n\r\nSpecial thanks: ·è×Ó,zclyj,the author of IDAFicator"
+        "\r\n\r\nall functions:show label, let od can load sys, toolbar, jmp stack"
+        ,"About",MB_ICONINFORMATION);
+}
+
+#include <vector>
+std::wstring string2wstring(const std::string & rString, UINT codepage)
+{
+    int len = MultiByteToWideChar(codepage, 0, rString.c_str(), -1, NULL, 0);
+    if(len > 0)
+    {		
+        std::vector<wchar_t> vw(len);
+        MultiByteToWideChar(codepage, 0, rString.c_str(), -1, &vw[0], len);
+        return &vw[0];
+    }
+    else
+        return L"";
+}
+
+std::string wstring2string(const std::wstring & rwString, UINT codepage)
+{
+    int len = WideCharToMultiByte(codepage, 0, rwString.c_str(), -1, NULL, 0, NULL, NULL);
+    if(len > 0)
+    {		
+        std::vector<char> vw(len);
+        WideCharToMultiByte(codepage, 0, rwString.c_str(), -1, &vw[0], len, NULL, NULL);
+        return &vw[0];
+    }
+    else
+        return "";
+}
+
+
+bool IsSysFile(const TCHAR* DllPath)
+{
+    const TCHAR* p;
+    p = _tcsrchr(DllPath, '.');
+    if (p)
+    {
+        if (0 == StrCmpNI(p, _T(".sys"), 4))
+        {
+            return true;
+            // *change =  1;
+        }
+    }
+
+    p = _tcsrchr(DllPath, _T('\\')) ;
+    if (p)
+    {
+        p += 1;
+
+        if (0 == _tcsicmp(p, _T("ntoskrnl.exe")))
+        {
+            return true;
+            //*change =  1;
+        }
+    }
+    return false;
 }

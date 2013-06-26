@@ -3,7 +3,7 @@
 #ifdef HOLYSHIT_EXPORTS // od110
 #pragma comment(lib, "OLLYDBG110.LIB")
 #else
-#pragma comment(lib, "ollydbg2.lib")
+#pragma comment(lib, "ollydbg201.lib")
 #endif
 
 t_dump * sdk_Getcpudisasmdump()

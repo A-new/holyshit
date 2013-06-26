@@ -30,12 +30,12 @@ typedef struct  _GUID
 } GUID;
 
 #ifdef INITGUID
-#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
-        const GUID name \
+#define DEFINE_GUID(image1, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+        const GUID image1 \
                 = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
 #else
-#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
-    const GUID name
+#define DEFINE_GUID(image1, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+    const GUID image1
 #endif // INITGUID
 #endif // !GUID_DEFINED
 

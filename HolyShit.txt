@@ -1,9 +1,16 @@
 HolyShit
 
+note:
+OD1->holyshit110.dll
+OD2->holyshit201.dll
+
+
 changelog:
+2013年6月25日 v0.3，增加toolbar(不兼容IDAFicator)，label显示bug修正，OD201H全功能同步更新
+
 2013年5月3日 v0.2，label显示为高亮包
 
 2013年5月2日 v0.1, 显示label
 
 
-by lynnux, 2013年5月2日
+by lynnux, 始于2013年5月2日

@@ -18,32 +18,51 @@ size_t CToolbar::init(const std::string& ini_path)
     try
     {
         read_ini(ini_path, pt);
-        size = pt.get<size_t>("setting.count", 0);
+        size = pt.get<size_t>("setting.countall", 0);
         int xBegin = pt.get<int>("setting.xbegin");
         if (size)
         {
             for (size_t i = 0; i<size; ++i)
             {
-                std::string item = boost::str(boost::format("setting.%dimage") % i);
+                try{
+                    TOOLBAR_ITEM bd;
+                    bd.x = xBegin + i*20;
 
-                BMP_DATA bd;
-                bd.name = pt.get<std::string>(item);
+                    size_t count = 1;
+                    try
+                    {
+                        std::string item = boost::str(boost::format("setting.%dcount") % i);
+                        count = pt.get<size_t>(item);
+                    }catch(...){}
+                    
+                    for (size_t j=1; j<= count; ++j)
+                    {
+                        try
+                        {
+                            std::string item = boost::str(boost::format("setting.%dimage%d") % i %j);
+                            std::string image = pt.get<std::string>(item);
+                            item = boost::str(boost::format("setting.%dcommand%d") % i % j);
+                            std::string cmd = pt.get<std::string>(item);
 
-                item = boost::str(boost::format("setting.%dcommand") % i);
-                bd.command = pt.get<std::string>(item);
+                            std::string::size_type pos = ini_path.find_last_of('\\');
+                            std::string img_path;
+                            img_path = ini_path.substr(0, pos) + "\\" + image;
+                            HBITMAP handle = ((HBITMAP)LoadImageA(NULL, img_path.c_str(),IMAGE_BITMAP,0,0,
+                                LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_DEFAULTSIZE));
 
-                bd.x = xBegin + i*20;
+                            if (handle && !cmd.empty())
+                            {
+                                bd.data.push_back(boost::make_tuple(handle, cmd));
+                            }
+                        }catch(...){}
+                    }
 
-                std::string::size_type pos = ini_path.find_last_of('\\');
-                std::string img_path;
-                img_path = ini_path.substr(0, pos) + "\\" + bd.name;
-                bd.handle = ((HBITMAP)LoadImageA(NULL, img_path.c_str(),IMAGE_BITMAP,0,0,
-                    LR_LOADFROMFILE | LR_CREATEDIBSECTION | LR_DEFAULTSIZE));
-                
-                if (bd.handle)
-                {
-                    m_bmp.push_back(bd);
+                    if (bd.data.size())
+                    {
+                        m_bmp.push_back(bd);
+                    }
                 }
+                catch(...){}
             }
         }
     }
@@ -53,7 +72,7 @@ size_t CToolbar::init(const std::string& ini_path)
     return m_bmp.size();
 }
 
-BMP_DATA CToolbar::get( size_t index )
+TOOLBAR_ITEM CToolbar::get( size_t index )
 {
     return m_bmp.at(index);
 }
@@ -77,10 +96,17 @@ void CToolbar::destory()
     {
         DeleteObject(m_pen);
     }
-    std::vector<BMP_DATA>::const_iterator ci = m_bmp.begin();
+    std::vector<TOOLBAR_ITEM>::iterator ci = m_bmp.begin();
     for (; ci != m_bmp.end(); ++ci)
     {
-        DeleteObject(ci->handle);
+        std::vector<TOOLBAR_ITEM::HADLE_CMD>::const_iterator ti = ci->data.begin();
+        for (; ti!= ci->data.end(); ++ti)
+        {
+            TOOLBAR_ITEM::HADLE_CMD temp = *ti;
+            HBITMAP handle = boost::get<0>(temp);
+            DeleteObject(handle);
+        }
+        ci->data.clear();
     }
     m_bmp.clear();
 }
@@ -88,7 +114,7 @@ void CToolbar::OnLeftButtonUp(LPARAM lParam)
 {
     int xPos = GET_X_LPARAM(lParam); 
     int yPos = GET_Y_LPARAM(lParam); 
-    std::vector<BMP_DATA>::const_iterator ci = at(xPos, yPos);
+    std::vector<TOOLBAR_ITEM>::const_iterator ci = at(xPos, yPos);
     if (ci != m_bmp.end())
     {
         MessageBox(0, 0, 0,0);
@@ -220,23 +246,29 @@ void CToolbar::draw(HWND hwnd,
     if (!lbtn_up) // È«²¿»­
     {
         HDC hDC = GetDC(hwnd);
-        std::vector<BMP_DATA>::const_iterator ci = m_bmp.begin();
+        std::vector<TOOLBAR_ITEM>::const_iterator ci = m_bmp.begin();
         for (; ci != m_bmp.end(); ++ci)
         {
-            draw_internal(hDC, ci->x, ci->handle, m_penWhite, m_penBlack);
+            HBITMAP handle = boost::get<0>(ci->data[ci->iStatus]);
+            draw_internal(hDC, ci->x, handle, m_penWhite, m_penBlack);
         }
         ReleaseDC(hwnd, hDC);
     }
     else
     {
-
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam); 
-        std::vector<BMP_DATA>::const_iterator ci = at(xPos, yPos);
+        std::vector<TOOLBAR_ITEM>::iterator ci = at(xPos, yPos);
         if (ci != m_bmp.end())
         {
             HDC hDC = GetDC(hwnd);
-            draw_internal(hDC, ci->x, ci->handle, m_penBlack, m_penWhite);
+            ++ci->iStatus;
+            if (ci->iStatus >= ci->data.size())
+            {
+                ci->iStatus = 0;
+            }
+            HBITMAP handle = boost::get<0>(ci->data[ci->iStatus]);
+            draw_internal(hDC, ci->x, handle, m_penBlack, m_penWhite);
             ReleaseDC(hwnd, hDC);
         }
     }
@@ -244,9 +276,9 @@ void CToolbar::draw(HWND hwnd,
 }
 
 // x:0-17 y:2-18
-std::vector<BMP_DATA>::const_iterator CToolbar::at( int x, int y )
+std::vector<TOOLBAR_ITEM>::iterator CToolbar::at( int x, int y )
 {
-    std::vector<BMP_DATA>::const_iterator ci = m_bmp.begin();
+    std::vector<TOOLBAR_ITEM>::iterator ci = m_bmp.begin();
     if (y > 2 && y <18)
     {
         for (; ci != m_bmp.end(); ++ci)
