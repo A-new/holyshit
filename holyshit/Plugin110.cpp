@@ -7,6 +7,8 @@
 #include "../common/loadsys.h"
 #include "../common/label.h"
 #include "../common/config.h"
+#include "../common/jmpstack.h"
+
 #include <Shlwapi.h>
 
 extc int  _export cdecl ODBG_Plugindata(char shortname[32])
@@ -39,6 +41,8 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
         if(CToolbar_Global.init(szTB.c_str()))//"D:\\src\\vc\\holyshit\\common\\test.ini"
             CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
     }
+
+
 
     //hook_CreateProcessInternalW();
 
@@ -119,6 +123,7 @@ bool bInjected = false;
 void  ODBG_Pluginmainloop(DEBUG_EVENT *debugevent) 
 {
     hook_label_functions();
+    hook_jmpstack_functions();
     //if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
     //{
     //    bInjected = false;

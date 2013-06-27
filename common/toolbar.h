@@ -18,9 +18,10 @@ struct TOOLBAR_ITEM
 
     // 计算出来的
     size_t iStatus;
-    int x; 
+    int x;
+    int xBegin;
 
-    TOOLBAR_ITEM() : iStatus(0){}
+    TOOLBAR_ITEM() : iStatus(0), xBegin(0){}
 };
 
 class CToolbar

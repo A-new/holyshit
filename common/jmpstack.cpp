@@ -1,6 +1,7 @@
 #include "jmpstack.h"
 #include "func.h"
 #include "../sdk/sdk.h"
+#include "hook.h"
 //#include <boost/>
 
 // 0x4CDA2D 表示鼠标点击的当前地址
@@ -35,11 +36,39 @@ HWND GetACPUASM_WND()
     }
     return 0;
 }
-
+typedef
+BOOL
+(WINAPI
+*CONTINUEDEBUGEVENT)(
+                   __in DWORD dwProcessId,
+                   __in DWORD dwThreadId,
+                   __in DWORD dwContinueStatus
+                   );
+CONTINUEDEBUGEVENT OldContinueDebugEvent;
+BOOL
+WINAPI
+ HookContinueDebugEvent(
+ __in DWORD dwProcessId,
+ __in DWORD dwThreadId,
+ __in DWORD dwContinueStatus
+ )
+{
+    return OldContinueDebugEvent(dwProcessId, dwThreadId, dwContinueStatus);
+}
 void hook_jmpstack_functions()
 {
     static bool bHooked = false;
+    if (!bHooked)
+    {
+        bHooked = true;
 
+        HMODULE hMod = GetModuleHandleW(L"Kernel32");
+        OldContinueDebugEvent = (CONTINUEDEBUGEVENT)GetProcAddress(hMod, "ContinueDebugEvent");
+        //hook(&(PVOID&)OldContinueDebugEvent, HookContinueDebugEvent);
+
+        static CJmpStack_ACPUASM a;
+        a.SubclassWindow(GetACPUASM_WND());
+    }
 }
 
 

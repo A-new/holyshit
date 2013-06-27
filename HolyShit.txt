@@ -1,16 +1,27 @@
 HolyShit
+features 功能:
+1.功能同步支持OD1.10和OD2.01h
+2.在汇编窗口增加一栏，显示label(包含export信息)
+3.使OD可以加载sys和ntoskrnl.exe文件
+4.非常灵活toolbar功能
 
-note:
-OD1->holyshit110.dll
-OD2->holyshit201.dll
+note 说明:
+版本对应文件：
+OD1.10  -> holyshit110.dll
+OD2.01h -> holyshit201.dll
+配置：
+OD配置文件的[Plugin HolyShit]节里设置：
+toolbar_ini     -> toolbar的配置ini文件路径，该ini的内容设置见示例toolbar.ini文件，需重启OD生效
+label_enable    -> 是否显示label栏，默认为显示，需重启OD生效
 
+changelog 更新历史:
+2013年6月25日 v0.3，增加toolbar(不兼容IDAFicator)，label添加export函数名显示，lable显示宽度自动保存。
+label支持合并到comment栏里去，但是会遇到某些地方不显示的情况，建议开启label显示，ini里可设置
+增加配置。OD201H全功能同步发布。
 
-changelog:
-2013年6月25日 v0.3，增加toolbar(不兼容IDAFicator)，label添加导出函数名显示以及bug修正，OD201H全功能同步发布
-
-2013年5月3日 v0.2，label显示为高亮包
+2013年5月3日 v0.2，label显示为高亮，让OD可以加载驱动！
+感谢：疯子 http://bbs.pediy.com/showthread.php?t=171729
 
 2013年5月2日 v0.1, 显示label
-
 
 by lynnux, 始于2013年5月2日

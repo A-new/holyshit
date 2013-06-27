@@ -14,8 +14,11 @@ void CConfig::loadall()
     // label相关初始化
     width_label = get_int(WIDTH_LABEL, DEFAULT_WIDTH_LABEL);
     width_comment = get_int(WIDTH_COMMENT, DEFAULT_WIDTH_COMMENT);
-    label_enabled_ = get_int(LABEL_ENABLE, 0);
-    check_.push_back(NM_COMMENT);
+    label_enabled_ = get_int(LABEL_ENABLE, 1);
+    //if (!label_enabled_)
+    //{
+    //    check_.push_back(NM_COMMENT);
+    //}
     check_.push_back(NM_LABEL);
     check_.push_back(NM_EXPORT);
 

@@ -34,6 +34,13 @@ size_t CToolbar::init(const std::string& ini_path)
                         std::string item = boost::str(boost::format("setting.%dcount") % i);
                         count = pt.get<size_t>(item);
                     }catch(...){}
+
+                    try
+                    {
+                        std::string item = boost::str(boost::format("setting.%dxbegin") % i);
+                        bd.xBegin = pt.get<size_t>(item);
+                        bd.x += bd.xBegin;
+                    }catch(...){}
                     
                     for (size_t j=1; j<= count; ++j)
                     {
@@ -117,6 +124,7 @@ void CToolbar::OnLeftButtonUp(LPARAM lParam)
     std::vector<TOOLBAR_ITEM>::iterator ci = at(xPos, yPos);
     if (ci != m_bmp.end())
     {
+        ShellExecuteA(NULL, 0, boost::get<1>(ci->data[ci->iStatus]).c_str(), NULL, NULL, SW_NORMAL);
         //MessageBox(0, boost::get<1>(ci->data[ci->iStatus]).c_str(), 0,0);
 
         ++ci->iStatus;
@@ -156,11 +164,30 @@ LRESULT CALLBACK CToolbar::WindowProc( HWND hwnd,
 std::vector<boost::tuple<LONG, LONG>> CToolbar::rect_calc(const LPRECT rc)
 {
     std::vector<boost::tuple<LONG, LONG>> ret;
+
     size_t s = m_bmp.size();
     if (s > 0)
     {
-        ret.push_back(boost::make_tuple(rc->left, m_bmp[0].x));
-        ret.push_back(boost::make_tuple(m_bmp[s-1].x + 18, rc->right));
+        LONG start = rc->left;
+        LONG end = m_bmp[0].x;
+        if (m_bmp[0].xBegin)
+        {
+            end += m_bmp[0].xBegin;
+        }
+
+        ret.push_back(boost::make_tuple(start, end)); // 头
+
+        for (size_t i = 1; i < m_bmp.size(); ++i)
+        {
+            if (m_bmp[i].xBegin)
+            {
+                start = m_bmp[i].x - m_bmp[i].xBegin - 1; // 不减1会有个小黑点
+                end = m_bmp[i].x;
+                ret.push_back(boost::make_tuple(start, end));
+            }
+        }
+
+        ret.push_back(boost::make_tuple(m_bmp[s-1].x + 18, rc->right)); // 尾
     }
     return ret;
 }

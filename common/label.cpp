@@ -27,11 +27,12 @@ int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sorthea
 #endif
             if (itest)
             {
-                //有个问题会出现N，但是并没有显示，后面要修复！
-                if (itest != 1 && *s != TEXT('N'))
-                {
-                    return itest;
-                }
+                ////有个问题会出现N，但是并没有显示，后面要修复！
+                //if (itest != 1 && *s != TEXT('N'))
+                //{
+                //    return itest;
+                //}
+                return itest;
             }
         }
 
@@ -58,16 +59,24 @@ int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sorthea
                 if (len)
                 {
                     memset(mask, DRAW_HILITE, len);
-                    //*select = DRAW_MASK | DRAW_VARWIDTH; // 不加上也可以，加上的话选不中
+                    *select = DRAW_MASK | DRAW_VARWIDTH; // 不加上也可以，加上的话选不中
+
                     break;
                 }
             }
 
-            // patch
-            if (!len && itest == 1)
+            //// patch
+            //if (!len && itest == 1)
+            //{
+            //    *s = TEXT('N');
+            //    return itest;
+            //}
+
+            // 无论有没有内容，都要设置这个
+            if (addr >= p->sel0 
+                && addr < p->sel1) // 是否选中该项
             {
-                *s = TEXT('N');
-                return itest;
+                *select |= DRAW_SELECT;
             }
             return len;
         }
