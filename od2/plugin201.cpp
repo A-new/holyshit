@@ -6,6 +6,7 @@
 #include "../common/label.h"
 #include "../common/define.h"
 #include "../common/config.h"
+#include "../common/command.h"
 #include <Shlwapi.h>
 
 // 005CFDF8 
@@ -40,7 +41,10 @@ extc int __cdecl ODBG2_Plugininit(void)
     {
         std::string path = wstring2string(szTB.c_str(), CP_ACP);
         if(CToolbar_Global.init(path))//"D:\\src\\vc\\holyshit\\common\\test.ini"
+        {
+            Command::RegisterBultinCommand();
             CToolbar_Global.attach(hwollymain);
+        }
     }
 
     return 0;

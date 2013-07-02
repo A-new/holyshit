@@ -4,41 +4,35 @@
 #include <string>
 #include <vector>
 
-#pragma pack(1)
 #define CConfig_Single (CConfig::getInstance())
 
 class CConfig
 {
 public:
-    static CConfig& getInstance()
-    {
-
-        static CConfig b;
-        return b;
-    }
+    static CConfig& getInstance();
 
     void loadall();
     void saveall(bool now = false);
 
     // od1≤≈”√
-    void set_mod(HMODULE mod){plugin_mod = mod;}
+    void set_mod(HMODULE mod);
 
     // label
-    bool label_enabled(){return label_enabled_;}
+    bool label_enabled();
 
-    const std::vector<int>& check(){return check_;} const
+    const std::vector<int>& check() const;
     // label.cpp
-    int get_width_label(){return width_label;}
-    int get_width_comment(){return width_comment;}
-    void set_width_label(int i){width_label = i;}
-    void set_width_comment(int i){width_comment = i;}
+    int get_width_label();
+    int get_width_comment();
+    void set_width_label(int i);
+    void set_width_comment(int i);
 
     bool label_mix_comment();
     void label_mix_comment_set(bool add);
 
     // toolbar
-    std::tstring get_ini_path(){return ini_path;}
-    void set_ini_path(const std::tstring& path){ ini_path = path;}
+    std::tstring get_ini_path();
+    void set_ini_path(const std::tstring& path);
 
 protected:
     int get_int(TCHAR* key, int def);
@@ -46,6 +40,7 @@ protected:
 
     int get_str(TCHAR* key, LPTSTR str_buf, LPTSTR def);
     int set_str(TCHAR* key, LPTSTR str);
+
 private:
     HMODULE plugin_mod;
 

@@ -2,18 +2,15 @@
 #include <Windows.h>
 #include <tchar.h>
 #include "../sdk/sdk.h"
-#pragma pack(1)
+//#pragma pack(1)
 // 以此为基类，不同窗口可能会派生不同的 ?? 
 // 直接拿ATL来用! 因为这样派生，最不好处理的就是WindowProc，因为它是static的！
 class CJmpStack
 {
 public:
     static HWND FindACPUASM(const TCHAR* clsName);
-    static CJmpStack& getInstance()
-    {
-        static CJmpStack a;
-        return a;
-    }
+    static CJmpStack& getInstance();
+
     void Attach(HWND);
 protected:
     static LRESULT CALLBACK WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -62,13 +59,13 @@ protected:
         {
 //#define VK_EXECUTE        0x2B
 //#define VK_INSERT         0x2D
-            Sendshortcut(PM_DISASM, 0, WM_CHAR, 0, 0, VK_INSERT); // esc
+            //Sendshortcut(PM_DISASM, 0, WM_CHAR, 0, 0, VK_INSERT); // esc
             //Sendshortcut(PM_DISASM, 0, WM_CHAR, 0, 0, VK_EXECUTE); // `
             //::MessageBoxA(0, 0, 0, 0);
         }
         else if(wParam == VK_HOME)
         {
-            Sendshortcut(PM_DISASM, 0, WM_CHAR, 0, 0, VK_EXECUTE);
+            //Sendshortcut(PM_DISASM, 0, WM_CHAR, 0, 0, VK_EXECUTE);
         }
         else
             bHandled = FALSE;

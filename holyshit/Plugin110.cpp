@@ -8,6 +8,7 @@
 #include "../common/label.h"
 #include "../common/config.h"
 #include "../common/jmpstack.h"
+#include "../common/command_OD.h"
 
 #include <Shlwapi.h>
 
@@ -39,10 +40,11 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
     if (PathFileExistsA(szTB.c_str()))
     {
         if(CToolbar_Global.init(szTB.c_str()))//"D:\\src\\vc\\holyshit\\common\\test.ini"
+        {
+            Command::RegisterBultinCommand();
             CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
+        }
     }
-
-
 
     //hook_CreateProcessInternalW();
 

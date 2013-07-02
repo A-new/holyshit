@@ -9,6 +9,7 @@
 
 #pragma pack(1) // fuck!因为OD SDK强制使用了pack，必须加句，否则其他使用如CConfig_Single去地方，跟plugin110.cpp里的不一样，
 // 会出现你不能发现的问题，如string莫名其妙崩溃，release编译会有warning C4742警告，千万不要忽略！
+// 解决办法，getInstance的实现放到cpp里面去
 
 struct TOOLBAR_ITEM
 {
@@ -27,11 +28,7 @@ struct TOOLBAR_ITEM
 class CToolbar
 {
 public:
-    static CToolbar& getInstance()
-    {
-        static CToolbar a;
-        return a;
-    }
+    static CToolbar& getInstance();
     size_t init(const std::string& ini_path);
     void attach(HWND hWnd);
 

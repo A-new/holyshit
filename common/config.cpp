@@ -83,6 +83,38 @@ int CConfig::set_str( TCHAR* key, LPTSTR str )
 #endif
 }
 
+CConfig& CConfig::getInstance()
+{
+
+    static CConfig b;
+    return b;
+}
+
+void CConfig::set_mod( HMODULE mod )
+{plugin_mod = mod;}
+
+bool CConfig::label_enabled(){return label_enabled_;}
+
+const std::vector<int>& CConfig::check() const
+{return check_;}
+
+int CConfig::get_width_label()
+{return width_label;}
+
+int CConfig::get_width_comment()
+{return width_comment;}
+
+void CConfig::set_width_label( int i )
+{width_label = i;}
+
+void CConfig::set_width_comment( int i )
+{width_comment = i;}
+
+std::tstring CConfig::get_ini_path()
+{return ini_path;}
+
+void CConfig::set_ini_path( const std::tstring& path )
+{ ini_path = path;}
 
 
 

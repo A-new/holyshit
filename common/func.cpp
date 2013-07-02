@@ -190,3 +190,15 @@ bool IsSysFile(const TCHAR* DllPath)
     }
     return false;
 }
+
+std::tstring GetDebugeedExePath()
+{
+    std::tstring ret;
+#ifdef HOLYSHIT_EXPORTS
+    const char* file = (const char*)Plugingetvalue(VAL_EXEFILENAME);
+    ret = file;
+#else
+    ret = executable;
+#endif
+    return ret;
+}

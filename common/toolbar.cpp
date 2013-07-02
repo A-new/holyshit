@@ -4,6 +4,7 @@
 #include <boost/format.hpp>
 #include "hook.h"
 #include <boost/foreach.hpp>
+#include "command.h"
 
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
@@ -124,8 +125,16 @@ void CToolbar::OnLeftButtonUp(LPARAM lParam)
     std::vector<TOOLBAR_ITEM>::iterator ci = at(xPos, yPos);
     if (ci != m_bmp.end())
     {
-        ShellExecuteA(NULL, 0, boost::get<1>(ci->data[ci->iStatus]).c_str(), NULL, NULL, SW_NORMAL);
+        std::string exestr = boost::get<1>(ci->data[ci->iStatus]);
+
+        if (0 == exestr.compare(0, 5, "call:"))
+        {
+            CCommand_Single.Invoke(exestr.substr(5), ci->iStatus);
+        }
+        else
+            ShellExecuteA(NULL, 0, boost::get<1>(ci->data[ci->iStatus]).c_str(), NULL, NULL, SW_NORMAL);
         //MessageBox(0, boost::get<1>(ci->data[ci->iStatus]).c_str(), 0,0);
+        
 
         ++ci->iStatus;
         if (ci->iStatus >= ci->data.size())
@@ -327,8 +336,11 @@ std::vector<TOOLBAR_ITEM>::iterator CToolbar::at( int x, int y )
     return m_bmp.end();
 }
 
-
-
+CToolbar& CToolbar::getInstance()
+{
+    static CToolbar a;
+    return a;
+}
 
 
 WNDPROC CToolbar::m_prevProc = NULL;

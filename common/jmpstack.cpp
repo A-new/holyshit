@@ -113,3 +113,9 @@ CJmpStack::~CJmpStack()
 {
 
 }
+
+CJmpStack& CJmpStack::getInstance()
+{
+    static CJmpStack a;
+    return a;
+}

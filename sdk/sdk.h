@@ -1,4 +1,6 @@
 #pragma once
+// 项目注意，需要在工程属性里设置"结构成员对齐"为1，否则使用类静态函数可能出问题
+
 
 #include <windows.h>
 #include <tchar.h>
