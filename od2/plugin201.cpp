@@ -6,7 +6,7 @@
 #include "../common/label.h"
 #include "../common/define.h"
 #include "../common/config.h"
-#include "../common/command.h"
+#include "../common/command_OD.h"
 #include <Shlwapi.h>
 
 // 005CFDF8 

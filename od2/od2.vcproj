@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\command_OD.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\config.cpp"
 				>
 			</File>
@@ -226,6 +230,10 @@
 			>
 			<File
 				RelativePath="..\common\command.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\command_OD.h"
 				>
 			</File>
 			<File

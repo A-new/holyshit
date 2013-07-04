@@ -125,7 +125,7 @@ bool bInjected = false;
 void  ODBG_Pluginmainloop(DEBUG_EVENT *debugevent) 
 {
     hook_label_functions();
-    hook_jmpstack_functions();
+    //hook_jmpstack_functions();
     //if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
     //{
     //    bInjected = false;

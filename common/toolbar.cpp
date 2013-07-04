@@ -21,13 +21,14 @@ size_t CToolbar::init(const std::string& ini_path)
         read_ini(ini_path, pt);
         size = pt.get<size_t>("setting.countall", 0);
         int xBegin = pt.get<int>("setting.xbegin");
+        int xBegin_cur = xBegin;
         if (size)
         {
             for (size_t i = 0; i<size; ++i)
             {
                 try{
                     TOOLBAR_ITEM bd;
-                    bd.x = xBegin + i*20;
+                    bd.x = xBegin_cur + 20;
 
                     size_t count = 1;
                     try
@@ -67,6 +68,7 @@ size_t CToolbar::init(const std::string& ini_path)
 
                     if (bd.data.size())
                     {
+                        xBegin_cur = bd.x;
                         m_bmp.push_back(bd);
                     }
                 }
