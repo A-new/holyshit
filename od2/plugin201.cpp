@@ -7,6 +7,7 @@
 #include "../common/define.h"
 #include "../common/config.h"
 #include "../common/command_OD.h"
+#include "../common/jmpstack.h"
 #include <Shlwapi.h>
 
 // 005CFDF8 
@@ -31,6 +32,7 @@ extc int __cdecl ODBG2_Plugininit(void)
     CConfig_Single.loadall();
 
     hook_label_functions(); // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加
+    hook_jmpstack_functions();
 
     // loadsys相关初始化
     hook_loadsys_functions();
@@ -110,6 +112,7 @@ bool bInjected = false;
 void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent)
 {
     hook_label_functions(); // 否则有可能遗漏
+    hook_jmpstack_functions();
     //if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
     //{
     //    bInjected = false;
@@ -122,47 +125,47 @@ void ODBG2_Pluginreset(void)
 void  ODBG2_Pluginnotify(int code,void *data,
                          ulong parm1,ulong parm2)
 {
-    if (code == PN_STATUS)
-    {
-        if (parm1 == STAT_CLOSING
-            || parm1 == STAT_FINISHED)
-        {
-            bInjected = false;
-        }
+    //if (code == PN_STATUS)
+    //{
+    //    if (parm1 == STAT_CLOSING
+    //        || parm1 == STAT_FINISHED)
+    //    {
+    //        bInjected = false;
+    //    }
 
-        if(parm1 == STAT_PAUSED)
-        {
-            if (!bInjected)
-            {
-                if (rundll 
-                    && IsSysFile(executable))
-                {
-                    CHAR loadsys[MAX_PATH];
-                    GetModuleFileNameA(g_hModule, loadsys, MAX_PATH);
-                    LPSTR pFind = StrRChrA(loadsys, 0, '\\');
-                    if (pFind)
-                    {
-                        pFind += 1;
-                        *pFind = 0;
-                        lstrcatA(loadsys, "loadsys.dll");
-                    }
-                    else
-                    {
-                        lstrcpyA(loadsys, "loadsys.dll");
-                    }
-                    if(InjectIt(process, loadsys))
-                    {
-                        bInjected = true;
-                        //wchar_t* p = StrRChrW(executable, 0 ,L'\\') + 1;
-                        //t_module* tm = Findmodulebyname(p);
-                        //Setcpu(0,tm->entry,0,0,0,
-                        //    CPU_ASMHIST|CPU_ASMCENTER|CPU_ASMFOCUS);
-                        Run(STAT_RUNNING, 0); // sendmessage不起作用
-                    }
-                }
-            }
-        }
-    }
+    //    if(parm1 == STAT_PAUSED)
+    //    {
+    //        if (!bInjected)
+    //        {
+    //            if (rundll 
+    //                && IsSysFile(executable))
+    //            {
+    //                CHAR loadsys[MAX_PATH];
+    //                GetModuleFileNameA(g_hModule, loadsys, MAX_PATH);
+    //                LPSTR pFind = StrRChrA(loadsys, 0, '\\');
+    //                if (pFind)
+    //                {
+    //                    pFind += 1;
+    //                    *pFind = 0;
+    //                    lstrcatA(loadsys, "loadsys.dll");
+    //                }
+    //                else
+    //                {
+    //                    lstrcpyA(loadsys, "loadsys.dll");
+    //                }
+    //                if(InjectIt(process, loadsys))
+    //                {
+    //                    bInjected = true;
+    //                    //wchar_t* p = StrRChrW(executable, 0 ,L'\\') + 1;
+    //                    //t_module* tm = Findmodulebyname(p);
+    //                    //Setcpu(0,tm->entry,0,0,0,
+    //                    //    CPU_ASMHIST|CPU_ASMCENTER|CPU_ASMFOCUS);
+    //                    Run(STAT_RUNNING, 0); // sendmessage不起作用
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,

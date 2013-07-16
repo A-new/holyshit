@@ -19,6 +19,7 @@ public:
 
     // label
     bool label_enabled();
+    bool jmp_enabled(){return enable_jmp;}
 
     const std::vector<int>& check() const;
     // label.cpp
@@ -48,6 +49,8 @@ private:
     int width_label;
     int width_comment;
     std::vector<int> check_;
+
+    bool enable_jmp; // OD1Ä¬ÈÏ²»¿ªÆô
     
     std::tstring ini_path;
 

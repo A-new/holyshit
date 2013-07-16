@@ -9,12 +9,21 @@ bool CConfig::label_mix_comment()
     return false;
 }
 
+#define ENABLE_JMP TEXT("enable_jmp")
+
 void CConfig::loadall()
 {
     // label相关初始化
     width_label = get_int(WIDTH_LABEL, DEFAULT_WIDTH_LABEL);
     width_comment = get_int(WIDTH_COMMENT, DEFAULT_WIDTH_COMMENT);
     label_enabled_ = get_int(LABEL_ENABLE, 1);
+
+#ifdef HOLYSHIT_EXPORTS
+    enable_jmp = get_int(ENABLE_JMP, 0);
+#else
+    enable_jmp = get_int(ENABLE_JMP, 1);
+#endif
+
     //if (!label_enabled_)
     //{
     //    check_.push_back(NM_COMMENT);
@@ -37,10 +46,15 @@ void CConfig::saveall(bool now)
             width_label = get_width_label_now();
             width_comment = get_width_comment_now();
         }
-        set_int(WIDTH_LABEL, width_label);
-        set_int(WIDTH_COMMENT, width_comment);
+
+        if(width_label && width_comment)
+        {
+            set_int(WIDTH_LABEL, width_label);
+            set_int(WIDTH_COMMENT, width_comment);
+        }
     }
     set_int(LABEL_ENABLE, label_enabled_);
+    set_int(ENABLE_JMP, enable_jmp);
     set_str(INI_PATH, (LPTSTR)ini_path.c_str());
 }
 

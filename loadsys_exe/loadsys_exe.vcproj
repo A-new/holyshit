@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="holyshit"
-	ProjectGUID="{60A859DD-2755-4959-95B5-AC378B76FD78}"
-	RootNamespace="holyshit"
+	Name="loadsys_exe"
+	ProjectGUID="{A08DAE4F-7DD4-41D8-BDB8-0D845B229F40}"
+	RootNamespace="loadsys_exe"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,8 +20,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="2"
+			ConfigurationType="1"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,12 +41,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HOLYSHIT_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				StructMemberAlignment="1"
-				DefaultCharIsUnsigned="true"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -62,11 +60,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="D:\green\odbg110\plugins\hollyshitd.dll"
+				AdditionalOptions="ntdll.lib"
+				OutputFile="$(OutDir)\loadsys.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
+				ModuleDefinitionFile="loadsys.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				FixedBaseAddress="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -95,8 +96,8 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="2"
+			ConfigurationType="1"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -118,11 +119,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HOLYSHIT_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
-				StructMemberAlignment="1"
 				EnableFunctionLevelLinking="true"
-				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -138,13 +137,17 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\holyshit110.dll"
+				AdditionalOptions="ntdll.lib"
+				OutputFile="$(OutDir)\loadsys.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
+				ModuleDefinitionFile="loadsys.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				EntryPointSymbol=""
+				RandomizedBaseAddress="1"
+				FixedBaseAddress="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -179,47 +182,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\common\command.cpp"
+				RelativePath=".\loadsys.def"
 				>
 			</File>
 			<File
-				RelativePath="..\common\command_OD.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\func.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\jmpstack.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\label.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\loadsys.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\map.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Plugin110.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\toolbar.cpp"
+				RelativePath=".\main.cpp"
 				>
 			</File>
 		</Filter>
@@ -228,6 +195,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\common\detours.h"
+				>
+			</File>
+			<File
+				RelativePath=".\myntdll.h"
+				>
+			</File>
 			<File
 				RelativePath=".\resource.h"
 				>
@@ -239,82 +214,14 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\holyshit.rc"
+				RelativePath=".\loadsys_exe.rc"
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="sdk"
+		<File
+			RelativePath="..\common\detours_x86.lib"
 			>
-			<File
-				RelativePath="..\sdk\sdk.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\sdk.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="common"
-			>
-			<File
-				RelativePath="..\common\command.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\command_OD.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\define.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\detours.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\detours_x86.lib"
-				>
-			</File>
-			<File
-				RelativePath="..\common\func.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\jmpstack.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\label.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\loadsys.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\map.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\Plugin110.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\toolbar.h"
-				>
-			</File>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
