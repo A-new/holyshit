@@ -1,10 +1,8 @@
 HolyShit
 
-梦想终结...
-
 features 功能:
 1.功能同步支持OD1.10和OD2.01h
-2.在汇编窗口增加一栏，显示label(包含export信息)
+2.在汇编窗口增加一栏，显示label(包含dll的export信息)
 3.使OD可以加载sys和ntoskrnl.exe文件
 4.非常灵活toolbar功能
 
@@ -12,6 +10,7 @@ note 说明:
 版本对应文件：
 OD1.10  -> holyshit110.dll
 OD2.01h -> holyshit201.dll
+loadsys.exe需要放在ollydbg.exe同级目录，其它放plugins目录
 
 toolbar内置命令：
 toolbar默认是调用shell，以call:开头就是调用内置命令

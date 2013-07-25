@@ -71,7 +71,7 @@ void __cdecl Mycompare3(TCHAR* buf, TCHAR* format, const TCHAR* dir,const TCHAR*
     if (0 == lstrcmpi(format, TEXT("\"%s\\LOADDLL.EXE\" %s"))
         && IsSysFile(DllPath))
     {
-        format = TEXT("\"%s\\LOADSYS.EXE\" %s");
+        format = TEXT("\"%s\\LOADSYS.EXE\" %s"); // fuck! release这里被优化了没了，解决方法对本文件单独设置禁止优化
     }
 }
 

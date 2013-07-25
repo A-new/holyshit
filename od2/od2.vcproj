@@ -205,6 +205,14 @@
 			<File
 				RelativePath="..\common\loadsys.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\common\map.cpp"
