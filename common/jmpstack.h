@@ -3,8 +3,6 @@
 #include <tchar.h>
 #include "../sdk/sdk.h"
 
-
-
 #include <atlbase.h>
 #include <atlwin.h>
 template <class T, class TBase = CWindow, class TWinTraits = ATL::CControlWinTraits>
