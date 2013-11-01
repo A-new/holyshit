@@ -40,8 +40,6 @@ protected:
 private:
 };
 
-HWND GetACPUASM_WND();
-
 void hook_jmpstack_functions();
 
 

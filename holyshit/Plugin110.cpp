@@ -45,12 +45,6 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
             CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
         }
     }
-
-    //hook_CreateProcessInternalW();
-
-    //hook_Sethardwarebreakpoint();
-    //hook_0040869C();
-    //hook_00439191();
     return 0;
 }
 
