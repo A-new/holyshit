@@ -9,7 +9,7 @@ features 功能:
 note 说明:
 版本对应文件：
 OD1.10  -> holyshit110.dll
-OD2.01h -> holyshit201.dll
+OD2.01 -> holyshit201.dll
 loadsys.exe需要放在ollydbg.exe同级目录，其它放plugins目录
 
 toolbar内置命令：
@@ -26,6 +26,8 @@ label_enable    -> 是否显示label栏，默认为显示，需重启OD生效
 enable_jmp      -> 是否开启esc和`跳转，OD2默认开启，OD1默认不开启
 
 changelog 更新历史:
+2013年11月1日 v0.3.3，移植到OD2.01正式版，功能无改变
+
 2013年7月15日 v0.3.2，更改sys加载方式，现在可以直接到达sys的OEP！便于驱动脱壳(暂时只处理了ExAllocatePoolWithTag和ExFreePoolWithTag)
 
 2013年7月5日 v0.3.1，修正toolbar的一个bug，增加toolbar调用内置命令的功能，支持调用OD其他插件的功能—初步只支持
