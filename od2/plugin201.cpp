@@ -29,6 +29,7 @@ extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
 extc int __cdecl ODBG2_Plugininit(void) 
 {
     g_ollyWnd = hwollymain;
+    CConfig_Single.set_mod(g_hModule);
     CConfig_Single.loadall();
 
     hook_label_functions(); // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加

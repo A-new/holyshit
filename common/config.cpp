@@ -3,6 +3,8 @@
 #include "../sdk/sdk.h"
 #include "toolbar.h"
 #include "label.h"
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
 
 bool CConfig::label_mix_comment()
 {
@@ -35,6 +37,18 @@ void CConfig::loadall()
     CConfig_Single.get_str(INI_PATH, szTB, TEXT(""));
     ini_path = TEXT("");
     ini_path = szTB;
+
+    // 尝试在holyshitxxx.dll同级目录找toolbar.ini
+    if (!PathFileExists(ini_path.c_str()))
+    {
+        TCHAR szToolBarTest[MAX_PATH];
+        GetModuleFileName(plugin_mod, szToolBarTest, MAX_PATH);
+        PathRemoveFileSpec(szToolBarTest);
+        PathAppend(szToolBarTest, TEXT("toolbar"));
+        PathAppend(szToolBarTest, TEXT("toolbar.ini"));
+        if(PathFileExists(szToolBarTest))
+            ini_path = szToolBarTest;
+    }
 }
 
 void CConfig::saveall(bool now)
