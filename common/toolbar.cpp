@@ -9,6 +9,12 @@
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
 
+#ifdef HOLYSHIT_EXPORTS
+PVOID OrgFillRect = (PVOID)0x00432EC7; // od1
+#else
+PVOID OrgFillRect = (PVOID)0x0040C50E; // od2
+#endif
+
 size_t CToolbar::init(const std::string& ini_path)
 {
     using boost::property_tree::ptree;
@@ -203,11 +209,6 @@ std::vector<boost::tuple<LONG, LONG>> CToolbar::rect_calc(const LPRECT rc)
     return ret;
 }
 
-#ifdef HOLYSHIT_EXPORTS
-PVOID OrgFillRect = (PVOID)0x00432EC7; // od1
-#else
-PVOID OrgFillRect = (PVOID)0x0040BC47; // od2
-#endif
 
 // зЂвт__cdecl
 int __cdecl Fake_FillRect(HDC hDC,

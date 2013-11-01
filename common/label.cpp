@@ -99,20 +99,6 @@ int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(cha
 }
 #endif
 
-//typedef void    (cdecl *DEFAULTBAR)(t_bar *pb);
-//DEFAULTBAR OrgDefaultbar;
-//void cdecl MyDefaultbar(t_bar *pb)
-//{
-//    OrgDefaultbar(pb);
-//}
-//void hook_Defaultbar()
-//{
-//    HMODULE hMod = GetModuleHandle(NULL);
-//    //int temp = (int)&;
-//    OrgDefaultbar = (DEFAULTBAR)GetProcAddress(hMod, "_Defaultbar");
-//    hook(&(PVOID&)OrgDefaultbar, MyDefaultbar);
-//}
-
 void hook_label_functions()
 {
     static boost::mutex mu;
@@ -154,7 +140,6 @@ void hook_label_functions()
 #endif
 
                 hooked = true;
-                //hook_Defaultbar();
             }
         }
     }

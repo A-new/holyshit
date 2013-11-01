@@ -11,11 +11,12 @@ PVOID OrgDllCheck3 = (PVOID)0x004778D4; // wsprint，改LOADDLL.exe为LOADSYS.exe
 PVOID OrgDllCheck4 = (PVOID)0x0042F9D2;
 PVOID OrgDllCheck5 = (PVOID)0x0042F9A3;
 #else // od2
-PVOID OrgDllCheck = (PVOID)0x0044BFCE; 
+PVOID OrgDllCheck = (PVOID)0x0044A9AB; 
 PVOID OrgDllCheck2 = (PVOID)0x00458257; // only for od2，第一个版本需要，现在有loadsys.exe了，不patch这个地方了
-PVOID OrgDllCheck3 = (PVOID)0x0044C1D0;
-PVOID OrgDllCheck6 = (PVOID)0x004D0ED4;
-PVOID OrgDllCheck7 = (PVOID)0x004542E4;
+PVOID OrgDllCheck3 = (PVOID)0x0044ABBD;// 0044C1D0;
+PVOID OrgDllCheck6 = (PVOID)0x004CC63C;// 004D0ED4;
+PVOID OrgDllCheck7 = (PVOID)0x00452361;// 004542E4;
+PVOID OrgDllCheck8 = (PVOID)0x0040A8D7; // 
 #endif
 
 
@@ -30,7 +31,7 @@ void __declspec(naked) MyDllCheck()
 #ifdef HOLYSHIT_EXPORTS
             lea eax, dword ptr [ebp - 0x08]
 #else
-            lea eax, dword ptr [ebp - 0x0C]
+            lea eax, dword ptr [ebp - 0x04]
 #endif
         mov change, eax
             pop eax
@@ -240,7 +241,25 @@ void __declspec(naked) MyDllCheck7()
         jmp OrgDllCheck7;
     }
 }
+
+void __cdecl compare_suffix(wchar_t* suffixDraged, const wchar_t* suffixDll)
+{
+    if(0 == lstrcmpiW(suffixDraged, L".sys"))
+    {
+        suffixDraged = L".dll"; // trick，让它以为是加载了.dll后辍的
+    }
+}
+void __declspec(naked) MyDllCheck8()
+{
+    __asm
+    {
+        call compare_suffix;
+        jmp OrgDllCheck8;
+    }
+}
+
 #endif
+
 
 void hook_loadsys_functions()
 {
@@ -254,6 +273,7 @@ void hook_loadsys_functions()
     //hook(&(PVOID&)OrgDllCheck2, MyDllCheck2); // 判断是否是主程序 only for OD2，第一个版本需要，现在有loadsys.exe了，不patch这个地方了
     hook(&(PVOID&)OrgDllCheck6, MyDllCheck6); // 去掉无法连接loaddll提示
     hook(&(PVOID&)OrgDllCheck7, MyDllCheck7); // 设置ep为永远达不到的地址
+    hook(&(PVOID&)OrgDllCheck8, MyDllCheck8); // 2.01正式版新的功能：非PE文件用dump打开，但是sys不包含在内
 #endif
 
 

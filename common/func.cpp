@@ -130,9 +130,9 @@ BOOL InjectIt(HANDLE hrp, LPCSTR DllPath/*, const DWORD dwRemoteProcessld*/)//×¢
 
 void about()
 {
-    MessageBoxA(g_ollyWnd,"HolyShit v0.3.2\r\nCopyright (C) 2013 lynnux\r\nlynnux@qq.com"
+    MessageBoxA(g_ollyWnd,"HolyShit v0.3.3\r\nCopyright (C) 2013 lynnux"
         "\r\n\r\nSpecial thanks: ·è×Ó,zclyj,the author of IDAFicator"
-        "\r\n\r\nall functions:show label, let od can load sys, toolbar"
+        "\r\n\r\nall functions:show label, load sys, toolbar"
         ,"About",MB_ICONINFORMATION);
 }
 

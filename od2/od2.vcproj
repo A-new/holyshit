@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="D:\green\od2\plugins\HolyShitd.dll"
+				OutputFile="D:\green\odbg201\plugins\HolyShitd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
 				GenerateDebugInformation="true"
