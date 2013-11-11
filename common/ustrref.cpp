@@ -1,5 +1,6 @@
 #include "ustrref.h"
 #include "../sdk/sdk.h"
+#include "func.h"
 
 static t_table   ustrref;             // Bookmark table
 
@@ -254,7 +255,7 @@ void UStrRef::ODBG2_Pluginnotify( int code,void *data, ulong parm1,ulong parm2 )
 };
 
 
-static int MAbout(t_table *pt,wchar_t *name,ulong index,int mode)
+static int MAbout2(t_table *pt,wchar_t *name,ulong index,int mode)
 {
     if (mode==MENU_VERIFY)
         return MENU_NORMAL;                // Always available
@@ -268,20 +269,28 @@ static t_menu mainmenu[] = {
     //{ L"load map file..",
     //L"load map file ,which maybe from IDA or dede",
     //K_NONE, MloadMap, NULL, 0 },
-    { L"About",
-    L"about holyshit",
-    K_NONE, MAbout, NULL, 0 },
-    { L"nothing more..",
-    L"about holyshit",
-    K_NONE, MAbout, NULL, 0 },
+    { L"ËÑË÷ASCII...",
+    L"ËÑË÷ËùÓÐASCII±àÂëµÄ×Ö·û´®",
+    K_NONE, MAbout2, NULL, 0 },
+    { L"ËÑË÷UNICODE...",
+    L"ËÑË÷ËùÓÐUNICODE±àÂëµÄ×Ö·û´®",
+    K_NONE, MAbout2, NULL, 0 },
+    { L"ÖÇÄÜËÑË÷...",
+    L"ËÑË÷ËùÓÐÖÐÎÄ×Ö·û´®",
+    K_NONE, MAbout2, NULL, 0 },
     { NULL, NULL, K_NONE, NULL, NULL, 0 }
 };
 
 t_menu * UStrRef::ODBG2_Pluginmenu( wchar_t *type )
 {
-    if (wcscmp(type,PWM_MAIN)==0)
-        // Main menu.
+    if (wcscmp(type,PWM_DISASM)==0)
+    {
+        if (!HasDebuggee())
+        {
+            return NULL;
+        }
         return mainmenu;
+    }
     return NULL;
 }
 

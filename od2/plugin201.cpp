@@ -121,6 +121,7 @@ static t_menu mainmenu[] = {
 extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
 {
     static std::vector<t_menu> all_menu;
+    all_menu.clear();
 
     for (IPLUGIN_LIST::iterator i = plugins_all.begin(); i != plugins_all.end(); ++i)
     {
@@ -139,14 +140,14 @@ extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
     if (wcscmp(type,PWM_MAIN)==0)
     {
         t_menu* p = mainmenu;
-        for (size_t t = 0; t < sizeof(mainmenu); ++t, ++p)
+        for (size_t t = 0; t < sizeof(mainmenu)/sizeof(t_menu); ++t, ++p)
         {
             all_menu.push_back(*p);
         }
     }
     else
     {
-        all_menu.push_back(mainmenu[sizeof(mainmenu) - 1]);
+        all_menu.push_back(mainmenu[sizeof(mainmenu)/sizeof(t_menu) - 1]);
     }
 
     if (all_menu.empty())

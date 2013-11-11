@@ -130,10 +130,10 @@ BOOL InjectIt(HANDLE hrp, LPCSTR DllPath/*, const DWORD dwRemoteProcessld*/)//注
 
 void about()
 {
-    MessageBoxA(g_ollyWnd,"HolyShit v0.3.3\r\nCopyright (C) 2013 lynnux"
-        "\r\n\r\nSpecial thanks: 疯子,zclyj,the author of IDAFicator"
-        "\r\n\r\nall functions:show label, load sys, toolbar"
-        ,"About",MB_ICONINFORMATION);
+    MessageBoxA(g_ollyWnd,"HolyShit v0.4.0\r\nCopyright (C) 2013 lynnux"
+        "\r\n\r\n感谢: 疯子,zclyj,IDAFicator的作者"
+        "\r\n\r\n所有功能:增加label栏, 加载sys, toolbar，搜索中文字符串"
+        ,"关于",MB_ICONINFORMATION);
 }
 
 #include <vector>
