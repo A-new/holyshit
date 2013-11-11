@@ -261,7 +261,7 @@ void __declspec(naked) MyDllCheck8()
 #endif
 
 
-void hook_loadsys_functions()
+static void hook_loadsys_functions()
 {
     hook(&(PVOID&)OrgDllCheck, MyDllCheck); // 让sys后辍的可以加载
     hook(&(PVOID&)OrgDllCheck3, MyDllCheck3); // 更改loaddll为loadsys
@@ -277,4 +277,16 @@ void hook_loadsys_functions()
 #endif
 
 
+}
+
+int LoadSys::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
+{
+    hook_loadsys_functions();
+    return 0;
+}
+
+int LoadSys::ODBG2_Plugininit( void )
+{
+    hook_loadsys_functions();
+    return 0;
 }

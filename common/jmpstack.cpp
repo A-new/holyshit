@@ -14,7 +14,7 @@ static HWND GetACPUASM_WND()
 }
 
 #include <boost/thread/mutex.hpp>
-void hook_jmpstack_functions()
+static void hook_jmpstack_functions()
 {
     static boost::mutex mu;
     static bool hooked = false;
@@ -61,4 +61,35 @@ LRESULT CJmpStack_ACPUASM::OnKeydown( UINT /*uMsg*/, WPARAM wParam, LPARAM /*lPa
     else
         bHandled = FALSE;
     return 0;
+}
+
+JmpStack::JmpStack( IConfigForJmpStack* i)
+: m_IConfigForJmpStack(i)
+{
+    
+}
+
+void JmpStack::_ODBG_Pluginmainloop( DEBUG_EVENT *debugevent )
+{
+    if (m_IConfigForJmpStack->jmp_enabled())
+    {
+        hook_jmpstack_functions();
+    }
+}
+
+int JmpStack::ODBG2_Plugininit( void )
+{
+    if (m_IConfigForJmpStack->jmp_enabled())
+    {
+        hook_jmpstack_functions();
+    }
+    return 0;
+}
+
+void JmpStack::ODBG2_Pluginmainloop( DEBUG_EVENT *debugevent )
+{
+    if (m_IConfigForJmpStack->jmp_enabled())
+    {
+        hook_jmpstack_functions();
+    }
 }

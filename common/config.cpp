@@ -33,7 +33,7 @@ void CConfig::loadall()
     check_.push_back(NM_EXPORT);
 
     TCHAR szTB[MAX_PATH];
-    CConfig_Single.get_str(INI_PATH, szTB, TEXT(""));
+    get_str(INI_PATH, szTB, TEXT(""));
     ini_path = TEXT("");
     ini_path = szTB;
 
@@ -142,6 +142,17 @@ std::tstring CConfig::get_ini_path()
 
 void CConfig::set_ini_path( const std::tstring& path )
 { ini_path = path;}
+
+
+//int CConfig::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
+//{
+//    
+//}
+
+void CConfig::_ODBG_Plugindestroy( void )
+{
+    saveall(true);
+}
 
 
 

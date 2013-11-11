@@ -40,19 +40,30 @@ protected:
 private:
 };
 
-void hook_jmpstack_functions();
-
 class IConfigForJmpStack
 {
 public:
-    
+    virtual bool jmp_enabled() = 0;
 };
-class JmpStack
+
+#include "IPlugin110.h"
+#include "IPlugin201.h"
+class JmpStack 
+    : public IPlugin110
+    , public IPlugin201
 {
 public:
-    JmpStack();
+    JmpStack(IConfigForJmpStack*);
+
+    // IPlugin110
+    virtual void  _ODBG_Pluginmainloop(DEBUG_EVENT *debugevent);
+
+    // IPlugin201
+    virtual int ODBG2_Plugininit(void);
+    virtual void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent);
 protected:
 private:
+    IConfigForJmpStack* m_IConfigForJmpStack;
 };
 
 #define CJmpStack_Single (CJmpStack::getInstance())

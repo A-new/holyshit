@@ -303,6 +303,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\IPlugin201.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\jmpstack.h"
 				>
 			</File>

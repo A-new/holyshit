@@ -4,26 +4,42 @@
 #include <string>
 #include <vector>
 #include "label.h"
+#include "jmpstack.h"
+#include "toolbar.h"
 
 #define CConfig_Single (CConfig::getInstance())
 
-class CConfig : public IConfigForLabel
+class CConfig 
+    : public IPlugin110
+    , public IPlugin201
+    , public IConfigForLabel
+    , public IConfigForJmpStack
+    , public IConfigForToolbar
 {
 public:
     static CConfig& getInstance();
+
+    // IPlugin110
+    //int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
+    //        ulong *features); // 由于牵涉太多，必须放Plugin110.cpp里写
+    void _ODBG_Plugindestroy(void);
 
     void setILabelForConfig(ILabelForConfig* i){m_ILabelForConfig = i;}
 
     void loadall();
     void saveall(bool now = false);
 
-    // od1才用
+    // 
     void set_mod(HMODULE mod);
 
     // label
     virtual bool label_enabled() const;
 
-    bool jmp_enabled(){return enable_jmp;}
+    // jmpstack
+    virtual bool jmp_enabled(){return enable_jmp;}
+
+    // toolbar
+    virtual std::tstring get_ini_path();
 
     const std::vector<int>& check() const;
     // label.cpp
@@ -35,8 +51,7 @@ public:
     bool label_mix_comment();
     void label_mix_comment_set(bool add);
 
-    // toolbar
-    std::tstring get_ini_path();
+
     void set_ini_path(const std::tstring& path);
 
 protected:

@@ -1,10 +1,71 @@
 #include "toolbar.h"
+#include <vector>
+#include <map>
+#include <boost/tuple/tuple.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/format.hpp>
 #include "hook.h"
 #include <boost/foreach.hpp>
 #include "command.h"
+#include <Shlwapi.h>
+#include "../common/command_OD.h"
+#include "../sdk/sdk.h"
+#include "../common/func.h"
+
+//#pragma pack(1) // fuck!因为OD SDK强制使用了pack，必须加句，否则其他使用如CConfig_Single去地方，跟plugin110.cpp里的不一样，
+// 会出现你不能发现的问题，如string莫名其妙崩溃，release编译会有warning C4742警告，千万不要忽略！
+// 解决办法，getInstance的实现放到cpp里面去
+
+#define CToolbar_Global (CToolbar::getInstance())
+
+struct TOOLBAR_ITEM
+{
+    // handle, cmd
+    typedef boost::tuple<HBITMAP, std::string> HADLE_CMD;
+    std::vector<HADLE_CMD> data;
+
+    // 计算出来的
+    size_t iStatus;
+    int x;
+    int xBegin;
+
+    TOOLBAR_ITEM() : iStatus(0), xBegin(0){}
+};
+
+class CToolbar
+{
+public:
+    static CToolbar& getInstance();
+    size_t init(const std::string& ini_path);
+    void attach(HWND hWnd);
+
+    std::vector<boost::tuple<LONG, LONG>> rect_calc(const LPRECT);
+protected:
+    TOOLBAR_ITEM get(size_t index);
+    std::vector<TOOLBAR_ITEM>::iterator at(int x, int y);
+    void draw(HWND hwnd,
+        UINT uMsg,
+        WPARAM wParam,
+        LPARAM lParam,
+        bool lbtn_up = false);
+    void destory();
+    CToolbar();
+    ~CToolbar();
+
+    // 窗口相关的代码其实可以仿jmpstack用ATL编写，因为这个类先写成就算了
+    static LRESULT CALLBACK WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+    void draw_internal(HDC hDC, int x, HBITMAP handle, HPEN hpen1, HPEN hpen2);
+    void OnLeftButtonUp(LPARAM lParam);
+private:
+    std::vector<TOOLBAR_ITEM> m_bmp;
+    static WNDPROC m_prevProc;
+    HWND m_hWnd;
+    HPEN m_pen;
+    HPEN m_penWhite;
+    HPEN m_penBlack;
+};
+
 
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
@@ -347,3 +408,46 @@ CToolbar& CToolbar::getInstance()
 
 
 WNDPROC CToolbar::m_prevProc = NULL;
+
+
+int Toolbar::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
+{
+#ifdef HOLYSHIT_EXPORTS
+    // toolbar相关初始化
+    std::tstring szTB = m_IConfigForToolbar->get_ini_path();
+    if (PathFileExistsA(szTB.c_str()))
+    {
+        if(CToolbar_Global.init(szTB.c_str()))//"D:\\src\\vc\\holyshit\\common\\test.ini"
+        {
+            Command::RegisterBultinCommand();
+            CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
+        }
+    }
+#endif
+    return 0;
+}
+
+int Toolbar::ODBG2_Plugininit( void )
+{
+#ifndef HOLYSHIT_EXPORTS
+
+    // toolbar相关初始化
+    std::tstring szTB = m_IConfigForToolbar->get_ini_path();
+    if (PathFileExistsW(szTB.c_str()))
+    {
+        std::string path = wstring2string(szTB.c_str(), CP_ACP);
+        if(CToolbar_Global.init(path))//"D:\\src\\vc\\holyshit\\common\\test.ini"
+        {
+            Command::RegisterBultinCommand();
+            CToolbar_Global.attach(hwollymain);
+        }
+    }
+#endif
+    return 0;
+}
+
+Toolbar::Toolbar( IConfigForToolbar* i)
+: m_IConfigForToolbar(i)
+{
+
+}

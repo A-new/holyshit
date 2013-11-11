@@ -6,8 +6,6 @@
 
 DRAWFUNC *g_func;
 
-
-
 #define COLUMN_LABELS 4
 
 static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
@@ -193,6 +191,7 @@ void Label::_ODBG_Pluginmainloop( DEBUG_EVENT *debugevent )
 
 int Label::ODBG2_Plugininit( void )
 {
+    // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加
     hook_label_functions();
     return 0;
 }

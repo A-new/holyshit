@@ -1,3 +1,6 @@
+#include <Shlwapi.h>
+#include <algorithm>
+#include <boost/bind.hpp>
 #include "../sdk/sdk.h"
 #include "../common/hook.h"
 #include "../common/func.h"
@@ -8,11 +11,11 @@
 #include "../common/config.h"
 #include "../common/command_OD.h"
 #include "../common/jmpstack.h"
-#include <Shlwapi.h>
 #include "ustrref.h"
 
-// 005CFDF8 
-// 005CFDFC 
+typedef std::vector<IPlugin201*> IPLUGIN_LIST;
+IPLUGIN_LIST plugins_all;
+
 HMODULE g_hModule = NULL;
 extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
                                    wchar_t pluginname[SHORTNAME],wchar_t pluginversion[SHORTNAME]) 
@@ -25,31 +28,31 @@ extc int __cdecl ODBG2_Pluginquery(int ollydbgversion,ulong *features,
     return PLUGIN_VERSION;               // Expected API version
 };
 
-
-
 extc int __cdecl ODBG2_Plugininit(void) 
 {
     g_ollyWnd = hwollymain;
-    CConfig_Single.set_mod(g_hModule);
-    CConfig_Single.loadall();
+    CConfig* pCConfig = new CConfig;
+    pCConfig->set_mod(g_hModule);
 
-    hook_label_functions(); // 如果之前退出OD时关闭了汇编窗口，下次启动时有时窗口仍然没有创建，也跟OD1一样，需要在mainloop里加
-    hook_jmpstack_functions();
+    // label
+    Label* pLabel = new Label(pCConfig);
+    plugins_all.push_back(pLabel);
+    pCConfig->setILabelForConfig(pLabel);
 
-    // loadsys相关初始化
-    hook_loadsys_functions();
+    // jmpstack
+    plugins_all.push_back(new JmpStack(pCConfig));
 
-    // toolbar相关初始化
-    std::tstring szTB = CConfig_Single.get_ini_path();
-    if (PathFileExistsW(szTB.c_str()))
-    {
-        std::string path = wstring2string(szTB.c_str(), CP_ACP);
-        if(CToolbar_Global.init(path))//"D:\\src\\vc\\holyshit\\common\\test.ini"
-        {
-            Command::RegisterBultinCommand();
-            CToolbar_Global.attach(hwollymain);
-        }
-    }
+    // loadsys
+    plugins_all.push_back(new LoadSys());
+
+    // toolbar
+    plugins_all.push_back(new Toolbar(pCConfig));
+
+    pCConfig->loadall();
+    plugins_all.push_back(pCConfig);
+
+    std::for_each(plugins_all.begin(), plugins_all.end(), boost::bind(&IPlugin201::ODBG2_Plugininit,
+        _1));
 
     ustrref_ODBG2_Plugininit();
 
@@ -58,8 +61,17 @@ extc int __cdecl ODBG2_Plugininit(void)
 
 void ODBG2_Plugindestroy(void)
 {
-    CConfig_Single.saveall(true);
+    std::for_each(plugins_all.begin(), plugins_all.end(), boost::bind(&IPlugin201::ODBG2_Plugindestroy,
+        _1));
+
     ustrref_ODBG2_Plugindestroy();
+
+    IPLUGIN_LIST::iterator i = plugins_all.begin();
+    for (; i != plugins_all.end(); ++i)
+    {
+        delete *i;
+    }
+    plugins_all.clear();
 }
 
 // ODBG2_Pluginclose是可以被撒消的
@@ -113,65 +125,21 @@ extc t_menu *ODBG2_Pluginmenu(wchar_t *type)
     return NULL;
 }
 
-bool bInjected = false;
 void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent)
 {
-    hook_label_functions(); // 否则有可能遗漏
-    hook_jmpstack_functions();
-    //if (debugevent && debugevent->dwDebugEventCode == EXIT_PROCESS_DEBUG_EVENT)
-    //{
-    //    bInjected = false;
-    //}
+    std::for_each(plugins_all.begin(), plugins_all.end(), boost::bind(&IPlugin201::ODBG2_Pluginmainloop,
+        _1, debugevent));
 }
 void ODBG2_Pluginreset(void)
 {
-    bInjected = false;
+    std::for_each(plugins_all.begin(), plugins_all.end(), boost::bind(&IPlugin201::ODBG2_Pluginreset,
+        _1));
+
     ustrref_ODBG2_Pluginreset();
 }
 void  ODBG2_Pluginnotify(int code,void *data,
                          ulong parm1,ulong parm2)
 {
-    //if (code == PN_STATUS)
-    //{
-    //    if (parm1 == STAT_CLOSING
-    //        || parm1 == STAT_FINISHED)
-    //    {
-    //        bInjected = false;
-    //    }
-
-    //    if(parm1 == STAT_PAUSED)
-    //    {
-    //        if (!bInjected)
-    //        {
-    //            if (rundll 
-    //                && IsSysFile(executable))
-    //            {
-    //                CHAR loadsys[MAX_PATH];
-    //                GetModuleFileNameA(g_hModule, loadsys, MAX_PATH);
-    //                LPSTR pFind = StrRChrA(loadsys, 0, '\\');
-    //                if (pFind)
-    //                {
-    //                    pFind += 1;
-    //                    *pFind = 0;
-    //                    lstrcatA(loadsys, "loadsys.dll");
-    //                }
-    //                else
-    //                {
-    //                    lstrcpyA(loadsys, "loadsys.dll");
-    //                }
-    //                if(InjectIt(process, loadsys))
-    //                {
-    //                    bInjected = true;
-    //                    //wchar_t* p = StrRChrW(executable, 0 ,L'\\') + 1;
-    //                    //t_module* tm = Findmodulebyname(p);
-    //                    //Setcpu(0,tm->entry,0,0,0,
-    //                    //    CPU_ASMHIST|CPU_ASMCENTER|CPU_ASMFOCUS);
-    //                    Run(STAT_RUNNING, 0); // sendmessage不起作用
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
