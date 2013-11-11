@@ -231,11 +231,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ustrref.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ustrref.h"
+				RelativePath="..\common\ustrref.cpp"
 				>
 			</File>
 		</Filter>
@@ -306,6 +302,10 @@
 			</File>
 			<File
 				RelativePath="..\common\toolbar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\ustrref.h"
 				>
 			</File>
 		</Filter>

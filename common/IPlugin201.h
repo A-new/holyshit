@@ -19,6 +19,7 @@ struct t_uddsave;
 #define PLUGIN_VERSION 0x02010001
 #endif
 typedef unsigned char  uchar;
+typedef unsigned long  ulong;          // Unsigned long
 
 class IPlugin201
 {

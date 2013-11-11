@@ -146,7 +146,7 @@ static t_menu bookmarkmenu[] = {       // Menu of the bookmark window
     }
 };
 
-int ustrref_ODBG2_Plugininit(void)
+int UStrRef::ODBG2_Plugininit( void )
 {
     if (Createsorteddata(
         &(ustrref.sorted),                // Descriptor of sorted data
@@ -198,26 +198,30 @@ int ustrref_ODBG2_Plugininit(void)
     //    Getfromini(NULL,PLUGINNAME,L"Restore window",L"%i",&restore);
     //    if (restore)
             Createtablewindow(&ustrref,0,ustrref.bar.nbar,NULL,
-            L"ICO_PLUGIN", L"aa");
+            L"ICO_PLUGIN", L"ÖÐÎÄËÑË÷");
     //    ;
     //};
 
+            return 0;
 }
 
-void __cdecl ustrref_ODBG2_Pluginreset(void) {
+void UStrRef::ODBG2_Pluginreset( void )
+{
     Deletesorteddatarange(&(ustrref.sorted),0,0xFFFFFFFF);
 };
 
-void __cdecl ustrref_ODBG2_Plugindestroy(void) {
+void UStrRef::ODBG2_Plugindestroy( void )
+{
     Destroysorteddata(&(ustrref.sorted));
 };
 
-void __cdecl ustrref_ODBG2_Pluginnotify(int code,void *data,
-                                     ulong parm1,ulong parm2) {
-                                         int i;
-                                         t_ustrref *pmark;
-                                         t_module *pmod;
-                                         switch (code) {
+void UStrRef::ODBG2_Pluginnotify( int code,void *data, ulong parm1,ulong parm2 )
+{
+    int i;
+    t_ustrref *pmark;
+    t_module *pmod;
+    switch (code) 
+    {
     case PN_ENDMOD:                    // Module is removed from the memory
         // Module is unloaded from the memory. This notification comes after
         // data was saved to the .udd file. All we need is to remove bookmarks
@@ -245,5 +249,39 @@ void __cdecl ustrref_ODBG2_Pluginnotify(int code,void *data,
             InvalidateRect(ustrref.hw,NULL,FALSE);
         break;
     default: break;                    // No action necessary
-                                         };
+                                         
+    };
 };
+
+
+static int MAbout(t_table *pt,wchar_t *name,ulong index,int mode)
+{
+    if (mode==MENU_VERIFY)
+        return MENU_NORMAL;                // Always available
+    else if (mode==MENU_EXECUTE) 
+    {
+        return MENU_REDRAW;
+    };
+    return MENU_ABSENT;
+}
+static t_menu mainmenu[] = {
+    //{ L"load map file..",
+    //L"load map file ,which maybe from IDA or dede",
+    //K_NONE, MloadMap, NULL, 0 },
+    { L"About",
+    L"about holyshit",
+    K_NONE, MAbout, NULL, 0 },
+    { L"nothing more..",
+    L"about holyshit",
+    K_NONE, MAbout, NULL, 0 },
+    { NULL, NULL, K_NONE, NULL, NULL, 0 }
+};
+
+t_menu * UStrRef::ODBG2_Pluginmenu( wchar_t *type )
+{
+    if (wcscmp(type,PWM_MAIN)==0)
+        // Main menu.
+        return mainmenu;
+    return NULL;
+}
+
