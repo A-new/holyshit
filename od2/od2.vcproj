@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="od2"
+	Name="Plugin201"
 	ProjectGUID="{40D3AA0B-94BD-4DA8-BBD8-286C6F678D7C}"
 	RootNamespace="od2"
 	Keyword="Win32Proj"
@@ -270,6 +270,10 @@
 			</File>
 			<File
 				RelativePath="..\common\hook.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\IPlugin201.h"
 				>
 			</File>
 			<File

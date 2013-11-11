@@ -3,13 +3,16 @@
 #include "define.h"
 #include <string>
 #include <vector>
+#include "label.h"
 
 #define CConfig_Single (CConfig::getInstance())
 
-class CConfig
+class CConfig : public IConfigForLabel
 {
 public:
     static CConfig& getInstance();
+
+    void setILabelForConfig(ILabelForConfig* i){m_ILabelForConfig = i;}
 
     void loadall();
     void saveall(bool now = false);
@@ -18,7 +21,8 @@ public:
     void set_mod(HMODULE mod);
 
     // label
-    bool label_enabled();
+    virtual bool label_enabled() const;
+
     bool jmp_enabled(){return enable_jmp;}
 
     const std::vector<int>& check() const;
@@ -54,4 +58,5 @@ private:
     
     std::tstring ini_path;
 
+    ILabelForConfig* m_ILabelForConfig;
 };

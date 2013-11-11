@@ -2,7 +2,6 @@
 #include "define.h"
 #include "../sdk/sdk.h"
 #include "toolbar.h"
-#include "label.h"
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
@@ -16,9 +15,9 @@ bool CConfig::label_mix_comment()
 void CConfig::loadall()
 {
     // label相关初始化
-    width_label = get_int(WIDTH_LABEL, DEFAULT_WIDTH_LABEL);
-    width_comment = get_int(WIDTH_COMMENT, DEFAULT_WIDTH_COMMENT);
-    label_enabled_ = get_int(LABEL_ENABLE, 1);
+    width_label = get_int((TCHAR*)m_ILabelForConfig->WIDTH_LABEL(), m_ILabelForConfig->DEFAULT_WIDTH_LABEL());
+    width_comment = get_int((TCHAR*)m_ILabelForConfig->WIDTH_COMMENT(), m_ILabelForConfig->DEFAULT_WIDTH_COMMENT());
+    label_enabled_ = get_int((TCHAR*)m_ILabelForConfig->LABEL_ENABLE(), 1);
 
 #ifdef HOLYSHIT_EXPORTS
     enable_jmp = get_int(ENABLE_JMP, 0);
@@ -57,17 +56,17 @@ void CConfig::saveall(bool now)
     {
         if (now)
         {
-            width_label = get_width_label_now();
-            width_comment = get_width_comment_now();
+            width_label = m_ILabelForConfig->get_width_label_now();
+            width_comment = m_ILabelForConfig->get_width_comment_now();
         }
 
         if(width_label && width_comment)
         {
-            set_int(WIDTH_LABEL, width_label);
-            set_int(WIDTH_COMMENT, width_comment);
+            set_int((TCHAR*)m_ILabelForConfig->WIDTH_LABEL(), width_label);
+            set_int((TCHAR*)m_ILabelForConfig->WIDTH_COMMENT(), width_comment);
         }
     }
-    set_int(LABEL_ENABLE, label_enabled_);
+    set_int((TCHAR*)m_ILabelForConfig->LABEL_ENABLE(), label_enabled_);
     set_int(ENABLE_JMP, enable_jmp);
     set_str(INI_PATH, (LPTSTR)ini_path.c_str());
 }
@@ -121,7 +120,7 @@ CConfig& CConfig::getInstance()
 void CConfig::set_mod( HMODULE mod )
 {plugin_mod = mod;}
 
-bool CConfig::label_enabled(){return label_enabled_;}
+bool CConfig::label_enabled() const{return label_enabled_;}
 
 const std::vector<int>& CConfig::check() const
 {return check_;}

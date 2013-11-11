@@ -6,8 +6,11 @@
 
 DRAWFUNC *g_func;
 
+
+
 #define COLUMN_LABELS 4
-int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
+
+static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
 {
     int col = 3;
     if (CConfig_Single.label_enabled())
@@ -93,13 +96,14 @@ int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sorthea
 }
 
 #ifdef HOLYSHIT_EXPORTS
-int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(char *,char *,int *,t_sortheader *,int)
+static int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(char *,char *,int *,t_sortheader *,int)
 {
     return DRAWFUNC_cpudasm(s, (uchar*)mask, select, 0, ps, column, 0);
 }
 #endif
 
-void hook_label_functions()
+
+void Label::hook_label_functions()
 {
     static boost::mutex mu;
     static bool hooked = false;
@@ -112,7 +116,7 @@ void hook_label_functions()
             t_table *p = &td->table;
             if (p && p->hw)
             {
-                if (CConfig_Single.label_enabled())
+                if (m_config->label_enabled())
                 {
                     t_bar* tb = &p->bar;
                     tb->nbar = 5;
@@ -146,7 +150,7 @@ void hook_label_functions()
 
 }
 
-int get_width_label_now()
+int Label::get_width_label_now() const
 {
     t_dump *td = sdk_Getcpudisasmdump();
     if (td)
@@ -164,7 +168,7 @@ int get_width_label_now()
     return 0;
 }
 
-int get_width_comment_now()
+int Label::get_width_comment_now() const
 {
     t_dump *td = sdk_Getcpudisasmdump();
     if (td)
@@ -181,3 +185,59 @@ int get_width_comment_now()
     }
     return 0;
 }
+
+void Label::_ODBG_Pluginmainloop( DEBUG_EVENT *debugevent )
+{
+    hook_label_functions();
+}
+
+int Label::ODBG2_Plugininit( void )
+{
+    hook_label_functions();
+    return 0;
+}
+
+void Label::ODBG2_Pluginmainloop( DEBUG_EVENT *debugevent )
+{
+    hook_label_functions();
+}
+
+
+Label::Label( const IConfigForLabel* config )
+: m_config(config)
+{
+    
+}
+
+//#define DEFAULT_WIDTH_LABEL 100
+//#define DEFAULT_WIDTH_COMMENT 200
+//#define WIDTH_LABEL TEXT("label_width")
+//#define WIDTH_COMMENT TEXT("comment_width")
+//#define LABEL_ENABLE TEXT("label_enable")
+
+int Label::DEFAULT_WIDTH_LABEL() const
+{
+    return 100;
+}
+
+int Label::DEFAULT_WIDTH_COMMENT() const
+{
+    return 200;
+}
+
+LPCTSTR Label::WIDTH_LABEL() const
+{
+    return TEXT("label_width");
+}
+
+LPCTSTR Label::WIDTH_COMMENT() const
+{
+    return TEXT("comment_width");
+}
+
+LPCTSTR Label::LABEL_ENABLE() const
+{
+    return TEXT("label_enable");
+}
+
+

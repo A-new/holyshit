@@ -42,5 +42,17 @@ private:
 
 void hook_jmpstack_functions();
 
+class IConfigForJmpStack
+{
+public:
+    
+};
+class JmpStack
+{
+public:
+    JmpStack();
+protected:
+private:
+};
 
 #define CJmpStack_Single (CJmpStack::getInstance())

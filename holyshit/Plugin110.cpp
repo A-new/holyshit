@@ -1,4 +1,6 @@
 #include <windows.h>
+#include <vector>
+#include <boost/bind.hpp>
 #include "../sdk/sdk.h"
 #include "../common/define.h"
 #include "../common/func.h"
@@ -11,6 +13,9 @@
 #include "../common/command_OD.h"
 
 #include <Shlwapi.h>
+
+typedef std::vector<IPlugin110*> IPLUGIN_LIST;
+IPLUGIN_LIST plugins_all;
 
 extc int  _export cdecl ODBG_Plugindata(char shortname[32])
 {
@@ -29,6 +34,8 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
     }
     g_ollyWnd = hw;
     CConfig_Single.set_mod(g_hModule);
+    plugins_all.push_back(new Label(reinterpret_cast<IConfigForLabel *>(&CConfig_Single)));
+
     CConfig_Single.loadall();
 
     //hook_DRAWFUNC_cpudasm放到mainloop里去做，因为在此处CPUDASM还没有创建起来
@@ -191,7 +198,8 @@ void ODBG_Pluginaction(int origin,int action,void *item)
 bool bInjected = false;
 void  ODBG_Pluginmainloop(DEBUG_EVENT *debugevent) 
 {
-    hook_label_functions();
+    std::for_each(plugins_all.begin(), plugins_all.end(), boost::bind(&IPlugin110::_ODBG_Pluginmainloop, _1, debugevent));
+    //hook_label_functions();
     if (CConfig_Single.jmp_enabled())
     {
         hook_jmpstack_functions();
