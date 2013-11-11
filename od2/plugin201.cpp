@@ -9,6 +9,7 @@
 #include "../common/command_OD.h"
 #include "../common/jmpstack.h"
 #include <Shlwapi.h>
+#include "ustrref.h"
 
 // 005CFDF8 
 // 005CFDFC 
@@ -50,12 +51,15 @@ extc int __cdecl ODBG2_Plugininit(void)
         }
     }
 
+    ustrref_ODBG2_Plugininit();
+
     return 0;
 }
 
 void ODBG2_Plugindestroy(void)
 {
     CConfig_Single.saveall(true);
+    ustrref_ODBG2_Plugindestroy();
 }
 
 // ODBG2_Pluginclose是可以被撒消的
@@ -122,6 +126,7 @@ void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent)
 void ODBG2_Pluginreset(void)
 {
     bInjected = false;
+    ustrref_ODBG2_Pluginreset();
 }
 void  ODBG2_Pluginnotify(int code,void *data,
                          ulong parm1,ulong parm2)

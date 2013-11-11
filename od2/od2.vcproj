@@ -230,6 +230,14 @@
 				RelativePath="..\common\toolbar.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\ustrref.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ustrref.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
