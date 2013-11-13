@@ -16,6 +16,7 @@
 #endif
 
 #include <windows.h>
+//#include "define.h"
 
 typedef enum tagSTR_FINDER_STRING_TYPE
 {
@@ -31,7 +32,7 @@ typedef void STR_FINDER_CALLBACK(
     const DWORD dwOffset,
     const DWORD dwSize,
     const STR_FINDER_STRING_TYPE StrType,
-    const char* strAddress // 改为字符串地址，就不需要内存占用了
+    const char* // 改为字符串地址，就不需要内存占用了
 );
 
 static const char *g_szStrFinderStrType[] =
@@ -43,7 +44,7 @@ static const char *g_szStrFinderStrType[] =
 
 static const TCHAR *g_szStrMsg[] =
 {
-    _T("(Initial CPU selection)"),    
+    TEXT("(Initial CPU selection)"),    
 };
 
 class CStrFinder
@@ -69,13 +70,12 @@ public:
     static BOOL GetStr(
         const STR_FINDER_STRING_TYPE StrType,
         const BYTE *pbyBuf,
-        const BYTE **pszStr,
         int *pnLen
         );
+
     static BOOL FollowImmediateAddr(
         const STR_FINDER_STRING_TYPE StrType,
         DWORD dwImmAddr,
-        const BYTE **pszStr,
         BOOL *pbFound,
         int& StrTypeGot
         );

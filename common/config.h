@@ -24,10 +24,10 @@ public:
     // IPlugin110
     //int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
     //        ulong *features); // 由于牵涉太多，必须放Plugin110.cpp里写
-    void _ODBG_Plugindestroy(void);
+    virtual void _ODBG_Plugindestroy(void);
 
     // IPlugin201
-    void ODBG2_Plugindestroy(void);
+    virtual void ODBG2_Plugindestroy(void);
 
     void setILabelForConfig(ILabelForConfig* i){m_ILabelForConfig = i;}
 
@@ -40,6 +40,8 @@ public:
     // label
     virtual bool label_enabled() const;
     virtual const std::vector<int>& check() const;
+    virtual int get_width_label() const;
+    virtual int get_width_comment() const;
 
     // jmpstack
     virtual bool jmp_enabled(){return enable_jmp;}
@@ -47,18 +49,9 @@ public:
     // toolbar
     virtual std::tstring get_ini_path();
 
-    virtual int get_width_label() const;
-    virtual int get_width_comment() const;
-    void set_width_label(int i);
-    void set_width_comment(int i);
-
-    bool label_mix_comment();
-    void label_mix_comment_set(bool add);
-
-
-    void set_ini_path(const std::tstring& path);
-
+    // OD2 patch string detect functions
     virtual bool patch_str(){return true;}
+
 protected:
     int get_int(TCHAR* key, int def);
     int set_int(TCHAR* key, int value);
@@ -66,6 +59,13 @@ protected:
     int get_str(TCHAR* key, LPTSTR str_buf, LPTSTR def);
     int set_str(TCHAR* key, LPTSTR str);
 
+    void set_width_label(int i);
+    void set_width_comment(int i);
+
+    bool label_mix_comment();
+    void label_mix_comment_set(bool add);
+
+    void set_ini_path(const std::tstring& path);
 private:
     HMODULE plugin_mod;
 

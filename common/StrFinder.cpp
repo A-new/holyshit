@@ -106,7 +106,6 @@ BOOL CStrFinder::IsGraphicCH(const USHORT dch)
 BOOL CStrFinder::GetStr(
     const STR_FINDER_STRING_TYPE StrType,
     const BYTE *pbyBuf,
-    const BYTE **pszStr,
     int *pnLen
 )
 {
@@ -175,15 +174,6 @@ BOOL CStrFinder::GetStr(
     if (0 == nLen)
         bFound = FALSE;
 
-    if (bFound)
-    {
-        if (i >= TEXTLEN)
-        {
-            //strcpy((char *)&pszStr[TEXTLEN - 4], " ...");
-            //nLen = TEXTLEN; // cut length to TEXTLEN
-        }
-    }
-
     if (pnLen)
         *pnLen = nLen;
 
@@ -193,7 +183,6 @@ BOOL CStrFinder::GetStr(
 BOOL CStrFinder::FollowImmediateAddr(
     const STR_FINDER_STRING_TYPE StrType,
     DWORD dwImmAddr,
-    const BYTE **pszStr,
     BOOL *pbFound,
     int& StrTypeGot
 )
@@ -234,17 +223,21 @@ BOOL CStrFinder::FollowImmediateAddr(
 
     if(StrType & enumSFST_Ascii)
     {
-        *pbFound = GetStr(enumSFST_Ascii, szBuf, pszStr, &nStrLen);
-        if(*pbFound) StrTypeGot = enumSFST_Ascii;
+        *pbFound = GetStr(enumSFST_Ascii, szBuf, &nStrLen);
+        if(*pbFound) 
+        {   
+            StrTypeGot = enumSFST_Ascii;
+        }
     }
     if((FALSE == *pbFound)
         && (StrType & enumSFST_Unicode))
     {
-        *pbFound = GetStr(enumSFST_Unicode, szBuf, pszStr, &nStrLen);
-        if(*pbFound) StrTypeGot = enumSFST_Unicode;
+        *pbFound = GetStr(enumSFST_Unicode, szBuf, &nStrLen);
+        if(*pbFound) 
+        {
+            StrTypeGot = enumSFST_Unicode;
+        }
     }
-    //if (FALSE == *pbFound)
-    //    *pbFound = GetStr(enumSFST_Unicode, szBuf, pszStr, &nStrLen);
 
     bRetResult = TRUE;
 Exit0:
@@ -333,7 +326,7 @@ BOOL CStrFinder::Find(
         )
         {
             
-            nRetCode = FollowImmediateAddr(StrType, dwImmAddr, &pszStr, &bFound, StrTypeGot);
+            nRetCode = FollowImmediateAddr(StrType, dwImmAddr, &bFound, StrTypeGot);
             if (!nRetCode)
                 break;
 
@@ -348,13 +341,13 @@ BOOL CStrFinder::Find(
 
         if(StrType & enumSFST_Ascii)
         {
-            bFound = GetStr(enumSFST_Ascii, szBuf, &pszStr, &nStrLen);
+            bFound = GetStr(enumSFST_Ascii, szBuf,  &nStrLen);
             if(bFound) StrTypeGot = enumSFST_Ascii;
         }
         if((FALSE == bFound)
             && (StrType & enumSFST_Unicode))
         {
-            bFound = GetStr(enumSFST_Unicode, szBuf, &pszStr, &nStrLen);
+            bFound = GetStr(enumSFST_Unicode, szBuf, &nStrLen);
             if(bFound) StrTypeGot = enumSFST_Unicode;
         }
         //bFound = GetStr(StrType, szBuf, &pszStr, &nStrLen);

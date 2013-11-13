@@ -55,6 +55,7 @@ extc int __cdecl ODBG2_Plugininit(void)
     // str_patch
     plugins_all.push_back(new str_patch(pCConfig));
 
+    // config只能是最后
     pCConfig->loadall();
     plugins_all.push_back(pCConfig);
 
