@@ -17,12 +17,12 @@ void CConfig::loadall()
     // label相关初始化
     width_label = get_int((TCHAR*)m_ILabelForConfig->WIDTH_LABEL(), m_ILabelForConfig->DEFAULT_WIDTH_LABEL());
     width_comment = get_int((TCHAR*)m_ILabelForConfig->WIDTH_COMMENT(), m_ILabelForConfig->DEFAULT_WIDTH_COMMENT());
-    label_enabled_ = get_int((TCHAR*)m_ILabelForConfig->LABEL_ENABLE(), 1);
+    label_enabled_ = get_int((TCHAR*)m_ILabelForConfig->LABEL_ENABLE(), 1) != 0;
 
 #ifdef HOLYSHIT_EXPORTS
-    enable_jmp = get_int(ENABLE_JMP, 0);
+    enable_jmp = get_int(ENABLE_JMP, 0) != 0;
 #else
-    enable_jmp = get_int(ENABLE_JMP, 1);
+    enable_jmp = get_int(ENABLE_JMP, 1) != 0;
 #endif
 
     //if (!label_enabled_)
@@ -125,10 +125,10 @@ bool CConfig::label_enabled() const{return label_enabled_;}
 const std::vector<int>& CConfig::check() const
 {return check_;}
 
-int CConfig::get_width_label()
+int CConfig::get_width_label() const
 {return width_label;}
 
-int CConfig::get_width_comment()
+int CConfig::get_width_comment() const
 {return width_comment;}
 
 void CConfig::set_width_label( int i )
@@ -150,6 +150,11 @@ void CConfig::set_ini_path( const std::tstring& path )
 //}
 
 void CConfig::_ODBG_Plugindestroy( void )
+{
+    saveall(true);
+}
+
+void CConfig::ODBG2_Plugindestroy( void )
 {
     saveall(true);
 }

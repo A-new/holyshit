@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\hook.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\jmpstack.cpp"
 				>
 			</File>
@@ -224,6 +228,14 @@
 			</File>
 			<File
 				RelativePath="..\sdk\sdk.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\StrFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\StrFinder.h"
 				>
 			</File>
 			<File
@@ -261,10 +273,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\hook.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\common\hook.h"
 				>
 			</File>
@@ -286,6 +294,14 @@
 			</File>
 			<File
 				RelativePath="..\common\map.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\OD2str.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\OD2str.h"
 				>
 			</File>
 			<File

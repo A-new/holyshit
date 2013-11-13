@@ -1,8 +1,12 @@
 #include "ustrref.h"
 #include "../sdk/sdk.h"
 #include "func.h"
+#include "StrFinder.h"
 
+#include <vector>
 static t_table   ustrref;             // Bookmark table
+static std::vector<const char*>  g_strings; // 搜索结果
+
 
 typedef struct t_ustrref
 {
@@ -44,19 +48,21 @@ void ustrref_destfunc(t_sorthdr *sh) {
 
 
 int ustrref_draw(wchar_t *s,uchar *mask,int *select,
-                 t_table *pt,t_drawheader *ph,int column,void *cache) {
-                     int m,n;                             // Number of symbols in the string
-                     ulong length;
-                     uchar cmd[MAXCMDSIZE];
-                     t_ustrref *pmark;
-                     t_disasm *pasm;
-                     n=0;
-                     // For simple tables, t_drawheader is the pointer to the data element. It
-                     // can't be NULL, except in DF_CACHESIZE, DF_FILLCACHE and DF_FREECACHE.
-                     pmark=(t_ustrref *)ph;
-                     // Our cache is just a t_disasm. It is not NULL on the same conditions.
-                     pasm=(t_disasm *)cache;
-                     switch (column) {
+                 t_table *pt,t_drawheader *ph,int column,void *cache) 
+{
+    int m,n;                             // Number of symbols in the string
+    ulong length;
+    uchar cmd[MAXCMDSIZE];
+    t_ustrref *pmark;
+    t_disasm *pasm;
+    n=0;
+    // For simple tables, t_drawheader is the pointer to the data element. It
+    // can't be NULL, except in DF_CACHESIZE, DF_FILLCACHE and DF_FREECACHE.
+    pmark=(t_ustrref *)ph;
+    // Our cache is just a t_disasm. It is not NULL on the same conditions.
+    pasm=(t_disasm *)cache;
+    switch (column) 
+    {
     case DF_CACHESIZE:                 // Request for draw cache size
         // Columns 3 and 4 (disassembly and comment) both require calls to
         // Disasm(). To accelerate processing, I call disassembler once per line
@@ -114,8 +120,9 @@ int ustrref_draw(wchar_t *s,uchar *mask,int *select,
         *select|=DRAW_VARWIDTH;
         break;
     default: break;
-                     };
-                     return n;
+
+    };
+    return n;
 };
 
 // Custom table function of bookmarks window. Here it is used only to process
@@ -194,14 +201,16 @@ int UStrRef::ODBG2_Plugininit( void )
     //// the .ini file but does not automatically restore them. Let us add this
     //// functionality here. To conform to OllyDbg norms, window is restored only
     //// if corresponding option is enabled.
-    //if (restorewinpos!=0) {
-    //    restore=0;                         // Default
-    //    Getfromini(NULL,PLUGINNAME,L"Restore window",L"%i",&restore);
-    //    if (restore)
+    if (restorewinpos!=0) {
+        int restore = 0;                         // Default
+        Getfromini(NULL, L"中文搜索",L"Restore window",L"%i",&restore);
+        if (restore)
+
             Createtablewindow(&ustrref,0,ustrref.bar.nbar,NULL,
             L"ICO_PLUGIN", L"中文搜索");
-    //    ;
-    //};
+
+        ;
+    };
 
             return 0;
 }
@@ -265,19 +274,166 @@ static int MAbout2(t_table *pt,wchar_t *name,ulong index,int mode)
     };
     return MENU_ABSENT;
 }
+
+static DWORD GetCurrentEip(void)
+{
+    t_thread* t2;
+
+    t2 = Findthread(Getcputhreadid());
+    return t2->reg.ip;
+}
+
+static int g_nTotalStrCount = 0;
+static void StrFinderCallBack(
+                              const int nStrIndex,
+                              const DWORD dwBase,
+                              const DWORD dwOffset,
+                              const DWORD dwSize,
+                              const STR_FINDER_STRING_TYPE StrType,
+                              const char* strAddress
+)
+{
+    BOOL bRetCode;
+    t_ustrref item;
+    BOOL bIsCurEip;
+    PVOID pvData;
+    DWORD dwAddr = dwBase + dwOffset;
+
+    //bIsCurEip = dwAddr == g_dwCurEip ? TRUE : FALSE;
+
+    item.index = nStrIndex;
+    item.size = 1;
+    item.type = 0;
+    item.addr = dwAddr;
+    //item.bIsCurEip = bIsCurEip;
+
+#ifndef HOLYSHIT_EXPORTS
+    pvData = Addsorteddata(&(ustrref.sorted), &item);
+#else
+    pvData = Addsorteddata(&(ustrref.data), &item);
+#endif
+
+    PROCESS_ERROR(pvData);
+
+    g_strings.push_back(strAddress);
+    //bRetCode = g_StrList.AddHeadNode(cszStr);
+    //PROCESS_ERROR(bRetCode);
+
+    Progress(dwOffset * 1000 / dwSize, _T("Strings found: %d"), nStrIndex);
+
+    //if (bIsCurEip)
+    //    g_nCurEip_Str_Index = nStrIndex;
+
+    ++g_nTotalStrCount;
+
+Exit0:
+    return ;
+}
+
+static BOOL FindStr(const STR_FINDER_STRING_TYPE StrType)
+{
+    BOOL bRetResult = FALSE;
+    BOOL bRetCode;
+    DWORD dwBase;
+    DWORD dwSize;
+    CStrFinder StrFinder;
+
+
+#ifndef HOLYSHIT_EXPORTS
+    if (ustrref.sorted.n)
+#else
+    if (ustrref.data.n)
+#endif
+    {
+        Deletesorteddatarange(
+#ifndef HOLYSHIT_EXPORTS
+            &(ustrref.sorted),
+#else
+            &(ustrref.data),
+#endif
+            0,
+#ifndef HOLYSHIT_EXPORTS
+            ustrref.sorted.n
+#else
+            ustrref.data.n
+#endif
+            );
+    }
+
+    Getdisassemblerrange(&dwBase, &dwSize);
+    if (0 == dwBase || 0 == dwSize)
+        goto Exit1;
+
+    g_strings.clear();
+
+    bRetCode = StrFinder.Find(GetCurrentEip(), StrType, dwBase, dwSize, StrFinderCallBack);
+    if (!bRetCode) return FALSE;
+
+    Progress(0, _T("$"));
+#ifdef HOLYSHIT_EXPORTS
+    Infoline(
+#else
+    Info(
+#endif
+        _T("Total strings found: %d  -  Ultra String Reference (%s Mode)"),
+        g_nTotalStrCount,
+        g_szStrFinderStrType[StrType]
+    );
+
+    //if (-1 != g_nCurEip_Str_Index)
+    //{
+    //    Selectandscroll(&g_ustrreftbl, g_nCurEip_Str_Index, 2);
+    //}
+
+Exit1:
+    bRetResult = TRUE;
+Exit0:
+    return bRetResult;
+}
+
+static int MSearchCommon(STR_FINDER_STRING_TYPE search_type, t_table *pt,wchar_t *name,ulong index,int mode) {
+    if (mode==MENU_VERIFY)
+        return MENU_NORMAL;                // Always available
+    else if (mode==MENU_EXECUTE) 
+    {
+        FindStr(search_type);
+
+        if (ustrref.hw==NULL)
+            // Create table window. Third parameter (ncolumn) is the number of
+            // visible columns in the newly created window (ignored if appearance is
+            // restored from the initialization file). If it's lower than the total
+            // number of columns, remaining columns are initially invisible. Fourth
+            // parameter is the name of icon - as OllyDbg resource.
+            Createtablewindow(&ustrref,0,ustrref.bar.nbar,NULL,
+            L"ICO_PLUGIN", L"中文搜索");
+        else
+            Activatetablewindow(&ustrref);
+        return MENU_REDRAW/*MENU_NOREDRAW*/; //强迫刷新，更新数据显示
+    };
+    return MENU_ABSENT;
+};
+static int MSearchAscii(t_table *pt,wchar_t *name,ulong index,int mode) {
+    return MSearchCommon(enumSFST_Ascii, pt, name, index, mode);
+}
+static int MSearchUnicode(t_table *pt,wchar_t *name,ulong index,int mode) {
+    return MSearchCommon(enumSFST_Unicode, pt, name, index, mode);
+}
+static int MSearchAuto(t_table *pt,wchar_t *name,ulong index,int mode) {
+    return MSearchCommon(enumSFST_Auto, pt, name, index, mode);
+}
 static t_menu mainmenu[] = {
     //{ L"load map file..",
     //L"load map file ,which maybe from IDA or dede",
     //K_NONE, MloadMap, NULL, 0 },
     { L"搜索ASCII...",
     L"搜索所有ASCII编码的字符串",
-    K_NONE, MAbout2, NULL, 0 },
+    K_NONE, MSearchAscii, NULL, 0 },
     { L"搜索UNICODE...",
     L"搜索所有UNICODE编码的字符串",
-    K_NONE, MAbout2, NULL, 0 },
+    K_NONE, MSearchUnicode, NULL, 0 },
     { L"智能搜索...",
     L"搜索所有中文字符串",
-    K_NONE, MAbout2, NULL, 0 },
+    K_NONE, MSearchAuto, NULL, 0 },
     { NULL, NULL, K_NONE, NULL, NULL, 0 }
 };
 
@@ -293,4 +449,3 @@ t_menu * UStrRef::ODBG2_Pluginmenu( wchar_t *type )
     }
     return NULL;
 }
-

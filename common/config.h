@@ -6,8 +6,9 @@
 #include "label.h"
 #include "jmpstack.h"
 #include "toolbar.h"
+#include "OD2str.h"
 
-#define CConfig_Single (CConfig::getInstance())
+//#define CConfig_Single (CConfig::getInstance())
 
 class CConfig 
     : public IPlugin110
@@ -15,6 +16,7 @@ class CConfig
     , public IConfigForLabel
     , public IConfigForJmpStack
     , public IConfigForToolbar
+    , public IConfigForStrpatch
 {
 public:
     static CConfig& getInstance();
@@ -23,6 +25,9 @@ public:
     //int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
     //        ulong *features); // 由于牵涉太多，必须放Plugin110.cpp里写
     void _ODBG_Plugindestroy(void);
+
+    // IPlugin201
+    void ODBG2_Plugindestroy(void);
 
     void setILabelForConfig(ILabelForConfig* i){m_ILabelForConfig = i;}
 
@@ -34,6 +39,7 @@ public:
 
     // label
     virtual bool label_enabled() const;
+    virtual const std::vector<int>& check() const;
 
     // jmpstack
     virtual bool jmp_enabled(){return enable_jmp;}
@@ -41,10 +47,8 @@ public:
     // toolbar
     virtual std::tstring get_ini_path();
 
-    const std::vector<int>& check() const;
-    // label.cpp
-    int get_width_label();
-    int get_width_comment();
+    virtual int get_width_label() const;
+    virtual int get_width_comment() const;
     void set_width_label(int i);
     void set_width_comment(int i);
 
@@ -54,6 +58,7 @@ public:
 
     void set_ini_path(const std::tstring& path);
 
+    virtual bool patch_str(){return true;}
 protected:
     int get_int(TCHAR* key, int def);
     int set_int(TCHAR* key, int value);

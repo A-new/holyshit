@@ -13,7 +13,7 @@ public:
         ulong *features);
 
     // IPlugin201
-    int ODBG2_Plugininit(void);
+    virtual int ODBG2_Plugininit(void);
 protected:
 private:
 };

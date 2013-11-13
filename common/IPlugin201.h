@@ -15,9 +15,9 @@ struct t_uddsave;
 #ifndef SHORTNAME
 #define SHORTNAME      32
 #endif
-#ifndef PLUGIN_VERSION
-#define PLUGIN_VERSION 0x02010001
-#endif
+//#ifndef PLUGIN_VERSION
+//#define PLUGIN_VERSION 0x02010001
+//#endif
 typedef unsigned char  uchar;
 typedef unsigned long  ulong;          // Unsigned long
 
@@ -25,9 +25,9 @@ class IPlugin201
 {
 public:
     virtual ~IPlugin201(){}
-    virtual int ODBG2_Pluginquery(int ollydbgversion,ulong *features,
-        wchar_t pluginname[SHORTNAME],
-        wchar_t pluginversion[SHORTNAME]){return PLUGIN_VERSION;}
+    //virtual int ODBG2_Pluginquery(int ollydbgversion,ulong *features,
+    //    wchar_t pluginname[SHORTNAME],
+    //    wchar_t pluginversion[SHORTNAME]){return PLUGIN_VERSION;}
     virtual int ODBG2_Plugininit(void){return 0;}
     virtual void ODBG2_Pluginanalyse(t_module *pmod){}
     virtual void ODBG2_Pluginmainloop(DEBUG_EVENT *debugevent){}

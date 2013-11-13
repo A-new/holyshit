@@ -8,10 +8,10 @@ DRAWFUNC *g_func;
 
 #define COLUMN_LABELS 4
 
-static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
+int Label::DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_sortheader *ps,int column, void * cache )
 {
     int col = 3;
-    if (CConfig_Single.label_enabled())
+    if (g_currentLabel->m_config->label_enabled())
     {
         col = COLUMN_LABELS;
     }
@@ -19,7 +19,7 @@ static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
     {
         int itest = 0;
         // 先检查原来的有没有
-        if (!CConfig_Single.label_enabled())
+        if (!g_currentLabel->m_config->label_enabled())
         {
 #ifdef HOLYSHIT_EXPORTS
             itest = g_func(s, (char*)mask, select, ps, column);
@@ -51,7 +51,7 @@ static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
 
         if (addr)
         {
-            const std::vector<int>& vCheck = CConfig_Single.check();
+            const std::vector<int>& vCheck = g_currentLabel->m_config->check();
             
             int len = 0;
             for (size_t i=0; i<vCheck.size(); ++i)
@@ -94,7 +94,7 @@ static int DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
 }
 
 #ifdef HOLYSHIT_EXPORTS
-static int MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(char *,char *,int *,t_sortheader *,int)
+int Label::MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(char *,char *,int *,t_sortheader *,int)
 {
     return DRAWFUNC_cpudasm(s, (uchar*)mask, select, 0, ps, column, 0);
 }
@@ -123,11 +123,11 @@ void Label::hook_label_functions()
                     tb->mode[COLUMN_LABELS] = BAR_NOSORT;
 
                     int size_font = tb->dx[2] / tb->defdx[2];
-                    tb->defdx[COLUMN_LABELS] = CConfig_Single.get_width_label() / size_font; // 字符串长度，需要重新计算，否则后面调用Defaultbar会显示不正常
-                    tb->dx[COLUMN_LABELS] = CConfig_Single.get_width_label();
+                    tb->defdx[COLUMN_LABELS] = m_config->get_width_label() / size_font; // 字符串长度，需要重新计算，否则后面调用Defaultbar会显示不正常
+                    tb->dx[COLUMN_LABELS] = m_config->get_width_label();
 
-                    tb->defdx[3] = CConfig_Single.get_width_comment() / size_font;
-                    tb->dx[3] = CConfig_Single.get_width_comment();
+                    tb->defdx[3] = m_config->get_width_comment() / size_font;
+                    tb->dx[3] = m_config->get_width_comment();
 
                     InvalidateRect(p->hw, NULL, TRUE);
 
@@ -205,7 +205,7 @@ void Label::ODBG2_Pluginmainloop( DEBUG_EVENT *debugevent )
 Label::Label( const IConfigForLabel* config )
 : m_config(config)
 {
-    
+    g_currentLabel = this;
 }
 
 //#define DEFAULT_WIDTH_LABEL 100
@@ -238,5 +238,7 @@ LPCTSTR Label::LABEL_ENABLE() const
 {
     return TEXT("label_enable");
 }
+
+Label* Label::g_currentLabel = NULL;
 
 

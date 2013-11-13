@@ -6,16 +6,16 @@
 struct t_module;
 struct t_reg;
 
-#ifndef PLUGIN_VERSION
-#define PLUGIN_VERSION 110 
-#endif
+//#ifndef PLUGIN_VERSION
+//#define PLUGIN_VERSION 110 
+//#endif
 typedef unsigned long  ulong;
 
 class IPlugin110
 {
 public:
     virtual ~IPlugin110(){}
-    virtual int  _ODBG_Plugindata(char shortname[32]){return PLUGIN_VERSION;}
+    //virtual int  _ODBG_Plugindata(char shortname[32]){return PLUGIN_VERSION;}
     virtual int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
         ulong *features){return 0;}
     virtual void _ODBG_Pluginmainloop(DEBUG_EVENT *debugevent){}

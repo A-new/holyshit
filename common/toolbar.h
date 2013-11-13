@@ -20,11 +20,11 @@ class Toolbar
 public:
     Toolbar(IConfigForToolbar*);
     // IPlugin110
-    int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
+    virtual int  _ODBG_Plugininit(int ollydbgversion,HWND hw,
         ulong *features);
 
     // IPlugin201
-    int ODBG2_Plugininit(void);
+    virtual int ODBG2_Plugininit(void);
 protected:
 private:
     IConfigForToolbar* m_IConfigForToolbar;

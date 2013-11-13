@@ -25,3 +25,14 @@ t_dump * sdk_Getmodulesdump()
 #endif
 }
 
+
+void cdecl Getdisassemblerrange(ulong *pbase,ulong *psize)
+{
+    t_dump * td = sdk_Getcpudisasmdump();
+    if (td)
+    {
+        *pbase = td->base;
+        *psize = td->size;
+    }
+
+}
