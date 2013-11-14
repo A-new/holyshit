@@ -2,7 +2,7 @@
 #include "func.h"
 #include "../sdk/sdk.h"
 
-void Explorer_Open(ARG_LIST_PTR)
+static void Explorer_Open(ARG_LIST_PTR)
 {
     if (HasDebuggee())
     {
@@ -13,8 +13,33 @@ void Explorer_Open(ARG_LIST_PTR)
     }
 }
 
+#ifndef HOLYSHIT_EXPORTS
+typedef int (__cdecl* MSEARCH)(t_table *pt,wchar_t *name,ulong index,int mode);
+static void OD2_SearchString(ARG_LIST_PTR)
+{
+    if (HasDebuggee())
+    {
+        MSEARCH pSearch = (MSEARCH)*((DWORD**) HARDCODE(0x00552AC4));
+        MSEARCH pInit = (MSEARCH)(*(DWORD**) HARDCODE(0x005532D4));
+        if (pSearch&& pInit)
+        {
+            t_dump *td = sdk_Getcpudisasmdump();
+            if (td)
+            {
+                // 相当于初始化，这个很容易跟踪到
+                pInit(&td->table, L"$", 0, 0);
 
-void Pluginmenu(ARG_LIST_PTR args)
+                // 参考004253CF
+                Suspendallthreads();
+                pSearch(&td->table, L"", 0, 1);
+                Resumeallthreads();
+            }
+        }
+    }
+}
+#endif
+
+static void Pluginmenu(ARG_LIST_PTR args)
 {
     HMODULE hMod = GetModuleHandleA(args->at(0).c_str());
     if (hMod)
@@ -74,5 +99,8 @@ namespace Command
     {
         CCommand_Single.Register("explorer", Explorer_Open);
         CCommand_Single.Register("Pluginmenu", Pluginmenu);
+#ifndef HOLYSHIT_EXPORTS
+        CCommand_Single.Register("SearchString", OD2_SearchString);
+#endif
     }
 }

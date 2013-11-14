@@ -208,12 +208,6 @@ Label::Label( const IConfigForLabel* config )
     g_currentLabel = this;
 }
 
-//#define DEFAULT_WIDTH_LABEL 100
-//#define DEFAULT_WIDTH_COMMENT 200
-//#define WIDTH_LABEL TEXT("label_width")
-//#define WIDTH_COMMENT TEXT("comment_width")
-//#define LABEL_ENABLE TEXT("label_enable")
-
 int Label::DEFAULT_WIDTH_LABEL() const
 {
     return 100;

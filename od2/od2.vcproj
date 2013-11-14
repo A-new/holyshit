@@ -223,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\OD2str.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\plugin201.cpp"
 				>
 			</File>
@@ -265,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\define.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\detours.h"
 				>
 			</File>
@@ -294,10 +302,6 @@
 			</File>
 			<File
 				RelativePath="..\common\map.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\OD2str.cpp"
 				>
 			</File>
 			<File

@@ -2,6 +2,7 @@
 #include "hook.h"
 #include "StrFinder.h"
 #include "../sdk/sdk.h"
+#include "../common/define.h"
 
 /*
 shit！OD对lea指令不作处理？lea eax,dword ptr[xxx]如果xxx是字符串，是不会去找的
@@ -102,55 +103,6 @@ bool isSimGra(const unsigned short dch)
         return false;
 }
 
-/*
-in _Isstring
-
-00487720   8B85 E0FEFFFF    MOV EAX,DWORD PTR SS:[EBP-0x120]         ; 首字符
-00487726   50               PUSH EAX
-00487727   E8 94B2F7FF      CALL ollydbg._IstextA
-0048772C   59               POP ECX
-0048772D   8945 F0          MOV DWORD PTR SS:[EBP-0x10],EAX
-00487730   8D9D E1FEFFFF    LEA EBX,DWORD PTR SS:[EBP-0x11F]
-00487736   33F6             XOR ESI,ESI
-00487738   46               INC ESI
-00487739   837D F0 02       CMP DWORD PTR SS:[EBP-0x10],0x2
-0048773D   75 05            JNZ SHORT ollydbg.00487744
-0048773F   43               INC EBX
-00487740   46               INC ESI
-00487741   90               NOP
-00487742   90               NOP
-00487743   90               NOP
-00487744   33C9             XOR ECX,ECX
-00487746   8A8D E0FEFFFF    MOV CL,BYTE PTR SS:[EBP-0x120]
-0048774C   3BFE             CMP EDI,ESI
-0048774E   894D FC          MOV DWORD PTR SS:[EBP-0x4],ECX           ; 取首个字符
-00487751   90               NOP                                      ; 第二个字符
-00487752   90               NOP
-00487753   90               NOP
-00487754   90               NOP
-00487755   90               NOP
-00487756   90               NOP
-00487757   7E 21            JLE SHORT ollydbg.0048777A
-00487759   8B03             MOV EAX,DWORD PTR DS:[EBX]
-0048775B   50               PUSH EAX
-0048775C   E8 5FB2F7FF      CALL ollydbg._IstextA
-00487761   59               POP ECX
-00487762   8945 F8          MOV DWORD PTR SS:[EBP-0x8],EAX
-00487765   837D F8 00       CMP DWORD PTR SS:[EBP-0x8],0x0
-00487769   74 0F            JE SHORT ollydbg.0048777A
-0048776B   837D F8 02       CMP DWORD PTR SS:[EBP-0x8],0x2
-0048776F   75 03            JNZ SHORT ollydbg.00487774
-00487771   43               INC EBX
-00487772   46               INC ESI
-00487773   90               NOP
-00487774   46               INC ESI
-00487775   43               INC EBX
-00487776   3BFE             CMP EDI,ESI
-00487778  ^7F DF            JG SHORT ollydbg.00487759
-
-
-*/
-
 // 用__stdcall省点力
 static int __stdcall IsTextA_check(int a)
 {
@@ -168,9 +120,9 @@ static void __declspec(naked) __cdecl hook_IsTextA()
         add esp, 4;
         cmp eax, 1;
         je back;
-        cmp dword ptr [esp], 0x0048772C;
+        cmp dword ptr [esp], /*HARDCODE*/0x0048772C;
         je check;
-        cmp dword ptr [esp], 0x00487761;
+        cmp dword ptr [esp], /*HARDCODE*/0x00487761;
         je check;
         jmp back;
 check:
@@ -231,7 +183,7 @@ int __cdecl hook_Utftounicode(const char *s,int ns,wchar_t *w,int nw)
 */
 
 
-PVOID lea_check = (PVOID)0x004A335D;
+PVOID lea_check = (PVOID)HARDCODE(0x004A335D);
 
 // 这里也许可以进一步判是否是lea操作，但是OD使用的反汇编引擎跟公开的disasm好像不一致，
 // 在disasm.h中DX_LEA是0x03000000，而调试OD中发现是0x04000000，暂时不管
@@ -384,7 +336,7 @@ int __cdecl hook_Isstring(ulong addr
             return ret;
 
         BYTE szBuf[TEXTLEN];
-        int nStrLen;
+        //int nStrLen;
         int nRetCode;
         nRetCode = Readmemory(
             szBuf, addr, sizeof(szBuf), MM_RESTORE | MM_SILENT
@@ -409,7 +361,7 @@ int str_patch::ODBG2_Plugininit( void )
     HMODULE hMain = GetModuleHandle(NULL);
 
     // "Use IsTextUnicode"，未导出，让OD不使用内部的_IstextW判断unicode
-    //*(DWORD*)0x0057DD38 = 0;
+    //*(DWORD*)HARDCODE(0x0057DD38) = 0;
 
     // Code page for ASCII dumps 
     *const_cast<int*>(&asciicodepage) = 936;
@@ -419,20 +371,6 @@ int str_patch::ODBG2_Plugininit( void )
     {
         *mbcscodepage = 936;
     }
-
-    //DWORD dwOld;
-    //VirtualProtect((PVOID)0x00487720, 0x1000, PAGE_EXECUTE_READWRITE, &dwOld);
-    //*(unsigned char*)0x00487720 = 0x8B;
-    //static const unsigned char p1 [] = 
-    //{
-    //    0x8d, 0x9d, 0xe1, 0xfe, 0xff, 0xff, 0x33, 0xf6, 0x46, 0x83, 0x7d, 0xf0, 0x02, 0x75, 0x05, 0x43,
-    //    0x46, 0x90, 0x90, 0x90, 0x33, 0xc9, 0x8a, 0x8d, 0xe0, 0xfe, 0xff, 0xff, 0x3b, 0xfe, 0x89, 0x4d,
-    //    0xfc, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x7e, 0x21, 0x8b, 0x03, 0x50, 0xe8, 0x5f, 0xb2, 0xf7,
-    //    0xff, 0x59, 0x89, 0x45, 0xf8, 0x83, 0x7d, 0xf8, 0x00, 0x74, 0x0f, 0x83, 0x7d, 0xf8, 0x02, 0x75,
-    //    0x03, 0x43, 0x46, 0x90
-    //};
-    //memcpy((unsigned char*)0x00487730, p1, sizeof(p1));
-    //VirtualProtect((PVOID)0x00487720, 0x1000, dwOld, &dwOld);
 
     // 对判断ascii中文很关键
     //org_IsTextA  = (ISTEXTA)GetProcAddress(hMain, "_IstextA");

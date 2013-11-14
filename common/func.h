@@ -13,8 +13,5 @@ bool HasDebuggee();
 
 std::tstring GetDebugeedExePath();
 
-BOOL InjectIt(HANDLE hrp, LPCSTR DllPath/*, const DWORD dwRemoteProcessld*/)/*×¢ÈëÖ÷º¯Êý */;
-
-
 bool IsSysFile(const TCHAR* DllPath);
 std::string wstring2string(const std::wstring & rwString, UINT codepage);

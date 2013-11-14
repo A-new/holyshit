@@ -11,3 +11,6 @@ namespace std
 #define tstring string
 #endif
 }
+
+// Ó²±àÂë±êÖ¾
+#define HARDCODE(x) x

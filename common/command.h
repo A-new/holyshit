@@ -5,10 +5,11 @@
 #include <boost/shared_ptr.hpp>
 #include <deque>
 /*
-调用：
-call:explorer，打开
+调用示例：
+call:explorer
 call:enable_hilight
 call:plugin_cmd,中文搜索,2
+call:SearchString
 */
 
 #define CCommand_Single (CCommand::get_Instance())

@@ -11,12 +11,12 @@ PVOID OrgDllCheck3 = (PVOID)0x004778D4; // wsprint，改LOADDLL.exe为LOADSYS.exe
 PVOID OrgDllCheck4 = (PVOID)0x0042F9D2;
 PVOID OrgDllCheck5 = (PVOID)0x0042F9A3;
 #else // od2
-PVOID OrgDllCheck = (PVOID)0x0044A9AB; 
-PVOID OrgDllCheck2 = (PVOID)0x00458257; // only for od2，第一个版本需要，现在有loadsys.exe了，不patch这个地方了
-PVOID OrgDllCheck3 = (PVOID)0x0044ABBD;// 0044C1D0;
-PVOID OrgDllCheck6 = (PVOID)0x004CC63C;// 004D0ED4;
-PVOID OrgDllCheck7 = (PVOID)0x00452361;// 004542E4;
-PVOID OrgDllCheck8 = (PVOID)0x0040A8D7; // 
+PVOID OrgDllCheck = (PVOID)HARDCODE(0x0044A9AB); 
+PVOID OrgDllCheck2 = (PVOID)HARDCODE(0x00458257); // only for od2，第一个版本需要，现在有loadsys.exe了，不patch这个地方了
+PVOID OrgDllCheck3 = (PVOID)HARDCODE(0x0044ABBD);// 0044C1D0;
+PVOID OrgDllCheck6 = (PVOID)HARDCODE(0x004CC63C);// 004D0ED4;
+PVOID OrgDllCheck7 = (PVOID)HARDCODE(0x00452361);// 004542E4;
+PVOID OrgDllCheck8 = (PVOID)HARDCODE(0x0040A8D7); // 
 #endif
 
 

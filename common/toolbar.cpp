@@ -73,7 +73,7 @@ private:
 #ifdef HOLYSHIT_EXPORTS
 PVOID OrgFillRect = (PVOID)0x00432EC7; // od1
 #else
-PVOID OrgFillRect = (PVOID)0x0040C50E; // od2
+PVOID OrgFillRect = (PVOID)HARDCODE(0x0040C50E); // od2
 #endif
 
 size_t CToolbar::init(const std::string& ini_path)
