@@ -13,17 +13,15 @@ str_patch::str_patch( IConfigForStrpatch* i)
 {
 
 }
-typedef int (__cdecl* ISTEXTA)(int);
 typedef int (__cdecl* ISTEXTW)(int);
 typedef int (__cdecl* ASCIITOUNICODE)(const char *s,int ns,wchar_t *w,int nw);
-typedef int (__cdecl* UTFTOUNICODE)(const char *t,int nt,wchar_t *w,int nw);
 typedef int (__cdecl *ISSTRING)(ulong addr,int isstatic,wchar_t *symb,int nsymb);
-static ISTEXTA org_IsTextA = NULL;
 static ISTEXTW org_IsTextW = NULL;
 static ASCIITOUNICODE org_Asciitounicode = NULL;
-static UTFTOUNICODE org_Utftounicode = NULL;
 static ISSTRING org_Isstring = NULL;
 
+
+// from 52论坛的 中文搜索插件
 static int IsSimplifiedCH(unsigned short &dch)
 {
     unsigned char highbyte;
@@ -89,7 +87,7 @@ static int IsGraphicCH(const unsigned short dch)
 
     return nRet;
 }
-bool isSimGra(const unsigned short dch)
+static bool isSimGra(const unsigned short dch)
 {
     unsigned char g_chrRet[2];
     g_chrRet[0]=0;
@@ -103,44 +101,12 @@ bool isSimGra(const unsigned short dch)
         return false;
 }
 
-// 用__stdcall省点力
-static int __stdcall IsTextA_check(int a)
-{
-    return isSimGra(a) ? 2 : 0;
-}
-
-//0x004A335D
-// 中文字符判断暂时不支持繁体(见“中文搜索源码”)
-static void __declspec(naked) __cdecl hook_IsTextA()
-{
-    __asm{
-        mov eax, dword ptr[esp + 4];
-        push eax;
-        call org_IsTextA;
-        add esp, 4;
-        cmp eax, 1;
-        je back;
-        cmp dword ptr [esp], /*HARDCODE*/0x0048772C;
-        je check;
-        cmp dword ptr [esp], /*HARDCODE*/0x00487761;
-        je check;
-        jmp back;
-check:
-        mov eax, dword ptr[esp + 4];
-        push eax;
-        call IsTextA_check;
-        jmp back;
-back:
-        retn
-    }
-}
-
-
 static void UnicodeToGB2312(unsigned char* pOut,unsigned short uData)   
 {   
     WideCharToMultiByte(CP_ACP,NULL,(LPCWSTR)&uData,1,(LPSTR)pOut,sizeof(unsigned short),NULL,NULL);   
     return;   
 }
+
 static int __cdecl hook_IsTextW(int a)
 {
     int ret = org_IsTextW(a);
@@ -158,22 +124,13 @@ static int __cdecl hook_IsTextW(int a)
     return ret;
 }
 
-int __cdecl hook_Asciitounicode(const char *s,int ns,wchar_t *w,int nw)
+static int __cdecl hook_Asciitounicode(const char *s,int ns,wchar_t *w,int nw)
 {
     // ns的长度是缓冲区长度
     int ret = MultiByteToWideChar(CP_ACP, 0, s, -1, w, nw);//org_Asciitounicode(s, ns, w, nw);
     return  ret - 1; // 多了个NULL
 }
 
-int __cdecl hook_Utftounicode(const char *s,int ns,wchar_t *w,int nw)
-{
-    int ret = org_Utftounicode(s, ns, w,nw);
-    if(ret == 0)
-    {
-        return hook_Asciitounicode(s, ns, w, nw);
-    }
-    return ret;
-}
 
 /*
 004A335D   8B45 C8               ||/MOV EAX,DWORD PTR SS:[EBP-0x38]
@@ -189,13 +146,25 @@ PVOID lea_check = (PVOID)HARDCODE(0x004A335D);
 // 在disasm.h中DX_LEA是0x03000000，而调试OD中发现是0x04000000，暂时不管
 void __declspec(naked) lea_patch()
 {
+    /*HARDCODE*/
     __asm
     {
+        pushad;
+        pushfd;
+
+        MOV EAX,DWORD PTR [EBP-0x1D1C]; // 取指令
+        AND EAX, 0xFF000000;
+        CMP EAX, 0x04000000;            // lea，跟disasm.h不一样
+        JNE back;
+
         MOV EAX,DWORD PTR [EBP-0x38];
-        TEST BYTE PTR [EAX+0x1],0x1; 
+        TEST BYTE PTR [EAX+0x1],0x1;    // 1 == OP_MEORY
         je back;
-        MOV BYTE PTR DS:[EAX+0x1],0x2 // 将OP_MEORY变成OP_CONST，最终效果一样
+
+        MOV BYTE PTR DS:[EAX+0x1],0x2; // 将OP_MEORY变成OP_CONST，最终效果一样
 back:
+        popfd;
+        popad;
         jmp lea_check;
     }
 } 
@@ -320,7 +289,7 @@ static BOOL GetStrW(
 }
 
 // 返回一共有多少个unicode
-int __cdecl hook_Isstring(ulong addr
+static int __cdecl hook_Isstring(ulong addr
                           ,int isstatic
                           ,wchar_t *symb // 缓存地址
                           ,int nsymb)    // 缓存大小
@@ -372,17 +341,13 @@ int str_patch::ODBG2_Plugininit( void )
         *mbcscodepage = 936;
     }
 
-    // 对判断ascii中文很关键
-    //org_IsTextA  = (ISTEXTA)GetProcAddress(hMain, "_IstextA");
-    //hook(&(PVOID&)org_IsTextA, hook_IsTextA);
-
     // IsTextUnicode没有我们的hook_IsTextW
     org_IsTextW  = (ISTEXTW)GetProcAddress(hMain, "_IstextW");
     hook(&(PVOID&)org_IsTextW, hook_IsTextW);
 
-    // 这个让界面显示的时候正常
-    org_Asciitounicode = (ASCIITOUNICODE)GetProcAddress(hMain, "_Asciitounicode");
-    hook(&(PVOID&)org_Asciitounicode, hook_Asciitounicode);
+    // 暂时用不到了，因为_Isstring被hook了
+    //org_Asciitounicode = (ASCIITOUNICODE)GetProcAddress(hMain, "_Asciitounicode");
+    //hook(&(PVOID&)org_Asciitounicode, hook_Asciitounicode);
 
     //org_Utftounicode = (UTFTOUNICODE)GetProcAddress(hMain, "_Utftounicode");
     //hook(&(PVOID&)org_Utftounicode, hook_Utftounicode);
@@ -393,9 +358,3 @@ int str_patch::ODBG2_Plugininit( void )
     hook(&(PVOID&)lea_check, lea_patch);
     return 0;
 }
-
-
-unsigned char MyArray [0x0019] =
-{
-    
-};
