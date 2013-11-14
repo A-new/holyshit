@@ -67,7 +67,7 @@ bool HasDebuggee()
 void about()
 {
     MessageBoxA(g_ollyWnd,"HolyShit v0.4.0\r\nCopyright (C) 2013 lynnux"
-        "\r\n\r\n感谢: 疯子,zclyj,IDAFicator的作者"
+        "\r\n\r\n感谢: 疯子,zclyj,IDAFicator的作者，夜风流"
         "\r\n\r\n所有功能:增加label栏, 加载sys, toolbar，搜索中文字符串"
         ,"关于",MB_ICONINFORMATION);
 }

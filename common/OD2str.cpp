@@ -144,7 +144,7 @@ PVOID lea_check = (PVOID)HARDCODE(0x004A335D);
 
 // 这里也许可以进一步判是否是lea操作，但是OD使用的反汇编引擎跟公开的disasm好像不一致，
 // 在disasm.h中DX_LEA是0x03000000，而调试OD中发现是0x04000000，暂时不管
-void __declspec(naked) lea_patch()
+static void __declspec(naked) lea_patch()
 {
     /*HARDCODE*/
     __asm
@@ -315,7 +315,7 @@ static int __cdecl hook_Isstring(ulong addr
         }
         int len;
         if (GetStrW(enumSFST_Ascii, szBuf, symb, &len)
-            && len >= 2)
+            /*&& len >= 2*/)
         {
             return lstrlenW(symb);
         }
@@ -336,7 +336,44 @@ static int __cdecl MyUnicodetoutf(const wchar_t *w,int nw,char *s,int ns)
     return ret;
 }
 
-void __declspec(naked) search_patch()
+/*
+0048772D   8945 F0          MOV DWORD PTR SS:[EBP-0x10],EAX                                ; fuck!后面UNICODE还要根据这个来判断，因为英文
+00487730   837D F0 02       CMP DWORD PTR SS:[EBP-0x10],0x2
+*/
+static PVOID patch1 = (PVOID)HARDCODE(0x0048772D);
+static void __declspec(naked) patch1_do()
+{
+    __asm
+    {
+        cmp eax,0;
+        jne back;
+        MOV EAX,DWORD PTR [EBP-0x120];
+        PUSH EAX;
+        call hook_IsTextW;
+        add esp, 4;
+back:
+        jmp patch1;
+    }
+}
+/*
+00487C0C   8D4E 02          LEA ECX,DWORD PTR DS:[ESI+0x2]
+00487C0F   3BF9             CMP EDI,ECX                              ; EDI最大256即0x100
+00487C11   7C 61            JL SHORT ollydbg.00487C74                ; ECX当前0x102
+*/
+static PVOID patch2 = (PVOID)HARDCODE(0x00487C0C);
+static void __declspec(naked) patch2_do()
+{
+    __asm
+    {
+        LEA ECX,DWORD PTR [ESI+0x2];
+        CMP EDI, ECX;
+        JGE back;
+        SUB ESI, 0x2
+back:
+        jmp patch2;
+    }
+}
+static void __declspec(naked) search_patch()
 {
     __asm
     {
@@ -381,5 +418,7 @@ int str_patch::ODBG2_Plugininit( void )
     搜索的时候却只有ASCII码和UNICODE码
     */
     hook(&(PVOID&)search_patchAddr, search_patch);
+    hook(&(PVOID&)patch1, patch1_do);
+    hook(&(PVOID&)patch2, patch2_do);
     return 0;
 }
