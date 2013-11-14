@@ -233,8 +233,7 @@ static BOOL GetStrW(
         else if (IsAlpha(pbyBuf[i]))
         {
             *pszStr++ = pbyBuf[i];
-            *pszStr++ = 0;
-            nLen += 2;
+            nLen += 1;
         }
         else if (IsGraphicCH(
             *(USHORT *)&pbyBuf[i]) ||
@@ -315,7 +314,8 @@ static int __cdecl hook_Isstring(ulong addr
             return ret;
         }
         int len;
-        if (GetStrW(enumSFST_Ascii, szBuf, symb, &len))
+        if (GetStrW(enumSFST_Ascii, szBuf, symb, &len)
+            && len >= 2)
         {
             return lstrlenW(symb);
         }
@@ -323,8 +323,27 @@ static int __cdecl hook_Isstring(ulong addr
     return ret;
 }
 
+
+
+
 static int* mbcscodepage = NULL;
 
+static PVOID search_patchAddr = (PVOID)HARDCODE(0x004A1961);
+static int __cdecl MyUnicodetoutf(const wchar_t *w,int nw,char *s,int ns)
+{
+    int ret = WideCharToMultiByte(CP_ACP,NULL, w, nw,s, ns, NULL,NULL);
+    s[ret] = '\0';
+    return ret;
+}
+
+void __declspec(naked) search_patch()
+{
+    __asm
+    {
+        call MyUnicodetoutf;
+        jmp search_patchAddr;
+    }
+}
 int str_patch::ODBG2_Plugininit( void )
 {
     HMODULE hMain = GetModuleHandle(NULL);
@@ -356,5 +375,11 @@ int str_patch::ODBG2_Plugininit( void )
     hook(&(PVOID&)org_Isstring, hook_Isstring);
 
     hook(&(PVOID&)lea_check, lea_patch);
+
+    /*
+    004A195C   E8 DF1AF6FF      CALL ollydbg._Unicodetoutf
+    搜索的时候却只有ASCII码和UNICODE码
+    */
+    hook(&(PVOID&)search_patchAddr, search_patch);
     return 0;
 }
