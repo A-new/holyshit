@@ -217,19 +217,19 @@ static BOOL GetStrW(
         {
             *pszStr++ = TEXT('\\');
             *pszStr++ = TEXT('r');
-            nLen += 2;
+            nLen += 1;
         }
         else if ('\n' == pbyBuf[i])
         {
             *pszStr++ = TEXT('\\');
             *pszStr++ = TEXT('n');
-            nLen += 2;
+            nLen += 1;
         }
         else if ('\t' == pbyBuf[i])
         {
             *pszStr++ = TEXT('\\');
             *pszStr++ = TEXT('t');
-            nLen += 2;
+            nLen += 1;
         }
         else if (IsAlpha(pbyBuf[i]))
         {
@@ -288,14 +288,44 @@ static BOOL GetStrW(
     return bFound;
 }
 
+int deep_search(ulong addr
+                ,int isstatic
+                ,wchar_t *symb
+                ,int nsymb)
+{
+    int ret = 0;
+    t_memory *pMem;
+    pMem = Findmemory(addr);
+    if ((NULL == pMem) || ('\0' == pMem->sectname[0]))
+        return ret;
+
+    ulong addr_deep;
+    int nRetCode;
+    nRetCode = Readmemory(
+        &addr_deep, addr, sizeof(addr_deep), MM_RESTORE | MM_SILENT
+        );
+    if (!nRetCode)
+    {
+        return ret;
+    }
+
+    pMem = Findmemory(addr_deep);
+    if ((NULL == pMem) || ('\0' == pMem->sectname[0]))
+        return ret;
+    
+    return org_Isstring(addr_deep, isstatic, symb, nsymb);
+}
+
 // 返回一共有多少个unicode
 static int __cdecl hook_Isstring(ulong addr
                           ,int isstatic
                           ,wchar_t *symb // 缓存地址
                           ,int nsymb)    // 缓存大小
 {
+    static wchar_t symb_temp[TEXTLEN];
+
     int ret;
-    // 原函数对unicode的支持还是比较好的，我们只处理ascii码情况
+    // 原函数对unicode的支持还是比较好的(在替换了IstextW的前提下)，我们只处理ascii码情况
     ret = org_Isstring(addr, isstatic, symb, nsymb);
     if(0 == ret)
     {
@@ -314,19 +344,66 @@ static int __cdecl hook_Isstring(ulong addr
         {
             return ret;
         }
+
         int len;
         if (GetStrW(enumSFST_Ascii, szBuf, symb, &len))
         {
-            return lstrlenW(symb);
+            szBuf[TEXTLEN-2] = 0;
+            szBuf[TEXTLEN-1] = 0;
+            ret = lstrlenW(symb);
         }
-        else
+
+        if (ret == 0    // 没找到
+            || len <= 4) // 有可能是地址
         {
             // 深度搜索
-            ulong addr2 = *((ulong*)szBuf);
-            pMem = Findmemory(addr2);
-            if ((NULL == pMem) || ('\0' == pMem->sectname[0]))
-                return ret;
-            return org_Isstring(addr2, isstatic, symb, nsymb);
+            int ret_deep = deep_search(addr, isstatic, symb_temp, TEXTLEN);
+            if (ret_deep > ret)
+            {
+                memcpy(symb, symb_temp, nsymb * sizeof(wchar_t));
+                symb[nsymb - 1] = 0;
+                ret = ret_deep;
+            }
+        }
+
+    }
+    else
+    {
+        // 如果搜索到的字符数不超过4个，那么就进行"深度搜索"
+        // ret包含ASCII ""前辍，要去掉再计算
+        bool to_deep_search = false;
+        if (*symb == L'A') // ASCII ""
+        {
+            if ((ret - 8) <= 4)
+            {
+                to_deep_search = true;
+            }
+        }
+        else if(*(symb) == L'U'&& *(symb + 1) == L'N') // UNICODE ""
+        {
+            if ((ret - 10) <= 4)
+            {
+                to_deep_search = true;
+            }
+        }
+        else if(*(symb) == L'U'&& *(symb + 1) == L'T') // UTF-8 ""
+        {
+            if ((ret - 8) <= 4)
+            {
+                to_deep_search = true;
+            }
+        }
+
+        if (to_deep_search)
+        {
+            // 深度搜索
+            int ret_deep = deep_search(addr, isstatic, symb_temp, TEXTLEN);
+            if (ret_deep > ret)
+            {
+                memcpy(symb, symb_temp, nsymb * sizeof(wchar_t));
+                symb[nsymb - 1] = 0;
+                ret = ret_deep;
+            }
         }
     }
     return ret;
@@ -348,9 +425,6 @@ static int __cdecl MyUnicodetoutf(const wchar_t *w,int nw,char *s,int ns)
 /*
 00487BE1   837D F0 00                 CMP DWORD PTR SS:[EBP-0x10],0x0          ; 首个字节是否是字符，是根据英文来判断的，对中文有问题
 00487BE5   0F84 89000000              JE ollydbg.00487C74
-
-上面无法patch，只能跳到这里来patch
-00487C74   833D 38DD5700 00           CMP DWORD PTR DS:[0x57DD38],0x0
 */
 static PVOID patch_unicode = (PVOID)HARDCODE(0x00487BE1);
 static void __declspec(naked) patch_unicode_do()
@@ -370,39 +444,33 @@ back:
         jmp patch_unicode;
     }
 }
+
 /*
-00487C0C   8D4E 02          LEA ECX,DWORD PTR DS:[ESI+0x2]
-00487C0F   3BF9             CMP EDI,ECX                              ; EDI最大256即0x100
-00487C11   7C 61            JL SHORT ollydbg.00487C74                ; ECX当前0x102
+00487587   E8 0811FDFF                  CALL ollydbg._Readmemory
+0048758C   83C4 10                      ADD ESP,0x10
+将读取到的
 */
-static PVOID patch_maxlen = (PVOID)HARDCODE(0x00487C0C);
+static PVOID patch_maxlen = (PVOID)HARDCODE(0x0048758C);
+static void __cdecl MyReadmemory(void *buf, ulong addr,ulong size,int mode)
+{
+    if (size > 2)
+    {
+        char* p = (char*)buf;
+        p += size - 2;
+        *p = 0;
+        ++p;
+        *p = 0;
+    }
+}
 static void __declspec(naked) patch_maxlen_do()
 {
     __asm
     {
-        LEA ECX,DWORD PTR [ESI+0x2];
-        CMP EDI, ECX;
-        JGE back;
-        SUB ESI, 0x2
-back:
+        call MyReadmemory
         jmp patch_maxlen;
     }
 }
-/*
-00487C1C   66:83BC35 E0FEFF>CMP WORD PTR SS:[EBP+ESI-0x120],0x0      ; 这里检查末尾是否为0
-*/
-static PVOID patch2_maxlen = (PVOID)HARDCODE(0x00487C1C);
-static void __declspec(naked) patch2_maxlen_do()
-{
-    __asm
-    {
-        CMP EDI, ECX;
-        JG back;
-        ADD ESI, 0x2 // 还原
-back:
-        jmp patch2_maxlen;
-    }
-}
+
 static void __declspec(naked) search_patch()
 {
     __asm
@@ -450,6 +518,14 @@ int str_patch::ODBG2_Plugininit( void )
     hook(&(PVOID&)search_patchAddr, search_patch);
     hook(&(PVOID&)patch_unicode, patch_unicode_do);
     hook(&(PVOID&)patch_maxlen, patch_maxlen_do);
-    hook(&(PVOID&)patch2_maxlen, patch2_maxlen_do);
+
+    /*
+    去掉多余的结果
+    004A33E9   E9 C6000000      JMP ollydbg.004A34B4
+    */
+    DWORD dwOld;
+    VirtualProtect((PVOID)0x004A33E9, 4, PAGE_EXECUTE_READWRITE, &dwOld);
+    *((DWORD*)0x004A33E9) = 0x0000C6E9;
+    VirtualProtect((PVOID)0x004A33E9, 4, dwOld, &dwOld);
     return 0;
 }
