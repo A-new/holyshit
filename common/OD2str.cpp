@@ -152,10 +152,11 @@ static void __declspec(naked) lea_patch()
         pushad;
         pushfd;
 
-        MOV EAX,DWORD PTR [EBP-0x1D1C]; // 取指令
-        AND EAX, 0xFF000000;
-        CMP EAX, 0x04000000;            // lea，跟disasm.h不一样
-        JNE back;
+        // 不仅是lea有OP_MEMORY，mov也有！但是这样速度有影响
+        //MOV EAX,DWORD PTR [EBP-0x1D1C]; // 取指令
+        //AND EAX, 0xFF000000;
+        //CMP EAX, 0x04000000;            // lea，跟disasm.h不一样
+        //JNE back;
 
         MOV EAX,DWORD PTR [EBP-0x38];
         TEST BYTE PTR [EAX+0x1],0x1;    // 1 == OP_MEORY
@@ -314,10 +315,18 @@ static int __cdecl hook_Isstring(ulong addr
             return ret;
         }
         int len;
-        if (GetStrW(enumSFST_Ascii, szBuf, symb, &len)
-            /*&& len >= 2*/)
+        if (GetStrW(enumSFST_Ascii, szBuf, symb, &len))
         {
             return lstrlenW(symb);
+        }
+        else
+        {
+            // 深度搜索
+            ulong addr2 = *((ulong*)szBuf);
+            pMem = Findmemory(addr2);
+            if ((NULL == pMem) || ('\0' == pMem->sectname[0]))
+                return ret;
+            return org_Isstring(addr2, isstatic, symb, nsymb);
         }
     }
     return ret;
@@ -337,22 +346,28 @@ static int __cdecl MyUnicodetoutf(const wchar_t *w,int nw,char *s,int ns)
 }
 
 /*
-0048772D   8945 F0          MOV DWORD PTR SS:[EBP-0x10],EAX                                ; fuck!后面UNICODE还要根据这个来判断，因为英文
-00487730   837D F0 02       CMP DWORD PTR SS:[EBP-0x10],0x2
+00487BE1   837D F0 00                 CMP DWORD PTR SS:[EBP-0x10],0x0          ; 首个字节是否是字符，是根据英文来判断的，对中文有问题
+00487BE5   0F84 89000000              JE ollydbg.00487C74
+
+上面无法patch，只能跳到这里来patch
+00487C74   833D 38DD5700 00           CMP DWORD PTR DS:[0x57DD38],0x0
 */
-static PVOID patch1 = (PVOID)HARDCODE(0x0048772D);
-static void __declspec(naked) patch1_do()
+static PVOID patch_unicode = (PVOID)HARDCODE(0x00487BE1);
+static void __declspec(naked) patch_unicode_do()
 {
     __asm
     {
-        cmp eax,0;
+        CMP DWORD PTR [EBP-0x10],0x0;
         jne back;
         MOV EAX,DWORD PTR [EBP-0x120];
         PUSH EAX;
         call hook_IsTextW;
         add esp, 4;
+        cmp eax, 0;
+        je back;
+        MOV DWORD PTR [EBP-0x10],EAX
 back:
-        jmp patch1;
+        jmp patch_unicode;
     }
 }
 /*
@@ -360,8 +375,8 @@ back:
 00487C0F   3BF9             CMP EDI,ECX                              ; EDI最大256即0x100
 00487C11   7C 61            JL SHORT ollydbg.00487C74                ; ECX当前0x102
 */
-static PVOID patch2 = (PVOID)HARDCODE(0x00487C0C);
-static void __declspec(naked) patch2_do()
+static PVOID patch_maxlen = (PVOID)HARDCODE(0x00487C0C);
+static void __declspec(naked) patch_maxlen_do()
 {
     __asm
     {
@@ -370,7 +385,22 @@ static void __declspec(naked) patch2_do()
         JGE back;
         SUB ESI, 0x2
 back:
-        jmp patch2;
+        jmp patch_maxlen;
+    }
+}
+/*
+00487C1C   66:83BC35 E0FEFF>CMP WORD PTR SS:[EBP+ESI-0x120],0x0      ; 这里检查末尾是否为0
+*/
+static PVOID patch2_maxlen = (PVOID)HARDCODE(0x00487C1C);
+static void __declspec(naked) patch2_maxlen_do()
+{
+    __asm
+    {
+        CMP EDI, ECX;
+        JG back;
+        ADD ESI, 0x2 // 还原
+back:
+        jmp patch2_maxlen;
     }
 }
 static void __declspec(naked) search_patch()
@@ -401,9 +431,9 @@ int str_patch::ODBG2_Plugininit( void )
     org_IsTextW  = (ISTEXTW)GetProcAddress(hMain, "_IstextW");
     hook(&(PVOID&)org_IsTextW, hook_IsTextW);
 
-    // 暂时用不到了，因为_Isstring被hook了
-    //org_Asciitounicode = (ASCIITOUNICODE)GetProcAddress(hMain, "_Asciitounicode");
-    //hook(&(PVOID&)org_Asciitounicode, hook_Asciitounicode);
+    // 部分非中文在显示跟中文搜索结果不一致
+    org_Asciitounicode = (ASCIITOUNICODE)GetProcAddress(hMain, "_Asciitounicode");
+    hook(&(PVOID&)org_Asciitounicode, hook_Asciitounicode);
 
     //org_Utftounicode = (UTFTOUNICODE)GetProcAddress(hMain, "_Utftounicode");
     //hook(&(PVOID&)org_Utftounicode, hook_Utftounicode);
@@ -418,7 +448,8 @@ int str_patch::ODBG2_Plugininit( void )
     搜索的时候却只有ASCII码和UNICODE码
     */
     hook(&(PVOID&)search_patchAddr, search_patch);
-    hook(&(PVOID&)patch1, patch1_do);
-    hook(&(PVOID&)patch2, patch2_do);
+    hook(&(PVOID&)patch_unicode, patch_unicode_do);
+    hook(&(PVOID&)patch_maxlen, patch_maxlen_do);
+    hook(&(PVOID&)patch2_maxlen, patch2_maxlen_do);
     return 0;
 }
