@@ -13,6 +13,7 @@ public:
     virtual std::tstring get_ini_path() = 0;
     //virtual void set_ini_path(const std::tstring& path) = 0;
 };
+
 class Toolbar
     : public IPlugin110
     , public IPlugin201

@@ -13,6 +13,7 @@
 #include "../common/jmpstack.h"
 #include "../common/ustrref.h"
 #include "../common/OD2str.h"
+#include "../common/command_OD.h"
 
 typedef std::vector<IPlugin201*> IPLUGIN_LIST;
 IPLUGIN_LIST plugins_all;
@@ -45,6 +46,9 @@ extc int __cdecl ODBG2_Plugininit(void)
 
     // loadsys
     plugins_all.push_back(new LoadSys());
+
+    // command
+    plugins_all.push_back(new CCommand_OD());
 
     // toolbar
     plugins_all.push_back(new Toolbar(pCConfig));

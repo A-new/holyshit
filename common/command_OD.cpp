@@ -1,6 +1,7 @@
 #include "command_OD.h"
 #include "func.h"
 #include "../sdk/sdk.h"
+#include "command.h"
 
 static void Explorer_Open(ARG_LIST_PTR)
 {
@@ -30,9 +31,7 @@ static void OD2_SearchString(ARG_LIST_PTR)
                 pInit(&td->table, L"$", 0, 0);
 
                 // ²Î¿¼004253CF
-                Suspendallthreads();
                 pSearch(&td->table, L"", 0, 1);
-                Resumeallthreads();
             }
         }
     }

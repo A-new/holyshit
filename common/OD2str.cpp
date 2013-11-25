@@ -3,6 +3,7 @@
 #include "StrFinder.h"
 #include "../sdk/sdk.h"
 #include "../common/define.h"
+#include <boost/shared_array.hpp>
 
 /*
 shit！OD对lea指令不作处理？lea eax,dword ptr[xxx]如果xxx是字符串，是不会去找的
@@ -288,6 +289,7 @@ static BOOL GetStrW(
     return bFound;
 }
 
+#define DEEP_SEARCH_TAG 0x87123
 int deep_search(ulong addr
                 ,int isstatic
                 ,wchar_t *symb
@@ -313,7 +315,7 @@ int deep_search(ulong addr
     if ((NULL == pMem) || ('\0' == pMem->sectname[0]))
         return ret;
     
-    return org_Isstring(addr_deep, isstatic, symb, nsymb);
+    return Isstring(addr_deep, DEEP_SEARCH_TAG, symb, nsymb); // 调用被hook过的Isstring
 }
 
 // 返回一共有多少个unicode
@@ -322,8 +324,6 @@ static int __cdecl hook_Isstring(ulong addr
                           ,wchar_t *symb // 缓存地址
                           ,int nsymb)    // 缓存大小
 {
-    static wchar_t symb_temp[TEXTLEN];
-
     int ret;
     // 原函数对unicode的支持还是比较好的(在替换了IstextW的前提下)，我们只处理ascii码情况
     ret = org_Isstring(addr, isstatic, symb, nsymb);
@@ -345,7 +345,7 @@ static int __cdecl hook_Isstring(ulong addr
             return ret;
         }
 
-        int len;
+        int len; // !len是原字符数个数，跟szBuf里得到的有可能不一样，如\r
         if (GetStrW(enumSFST_Ascii, szBuf, symb, &len))
         {
             szBuf[TEXTLEN-2] = 0;
@@ -353,21 +353,26 @@ static int __cdecl hook_Isstring(ulong addr
             ret = lstrlenW(symb);
         }
 
-        if (ret == 0    // 没找到
+        if ((ret == 0    // 没找到
             || len <= 4) // 有可能是地址
+            && isstatic != DEEP_SEARCH_TAG) 
         {
-            // 深度搜索
-            int ret_deep = deep_search(addr, isstatic, symb_temp, TEXTLEN);
-            if (ret_deep > ret)
+            boost::shared_ptr<wchar_t> symb_temp(new wchar_t[TEXTLEN]);
+            int ret_deep = deep_search(addr, DEEP_SEARCH_TAG, symb_temp.get(), TEXTLEN);
+            if (ret_deep)
             {
-                memcpy(symb, symb_temp, nsymb * sizeof(wchar_t));
+                int lentemp = ret;
+                *(symb + lentemp++) = L'-';
+                *(symb + lentemp++) = L'>';
+                memcpy(symb + lentemp, symb_temp.get(), (nsymb - lentemp) * sizeof(wchar_t));
+                ret = ret + 2 + ret_deep;
                 symb[nsymb - 1] = 0;
-                ret = ret_deep;
+
             }
         }
 
     }
-    else
+    else if(isstatic != DEEP_SEARCH_TAG)
     {
         // 如果搜索到的字符数不超过4个，那么就进行"深度搜索"
         // ret包含ASCII ""前辍，要去掉再计算
@@ -394,15 +399,18 @@ static int __cdecl hook_Isstring(ulong addr
             }
         }
 
-        if (to_deep_search)
+        if (to_deep_search )
         {
-            // 深度搜索
-            int ret_deep = deep_search(addr, isstatic, symb_temp, TEXTLEN);
-            if (ret_deep > ret)
+            boost::shared_ptr<wchar_t> symb_temp(new wchar_t[TEXTLEN]);
+            int ret_deep = deep_search(addr, DEEP_SEARCH_TAG, symb_temp.get(), TEXTLEN);
+            if (ret_deep)
             {
-                memcpy(symb, symb_temp, nsymb * sizeof(wchar_t));
+                int lentemp = ret;
+                *(symb + lentemp++) = L'-';
+                *(symb + lentemp++) = L'>';
+                memcpy(symb + lentemp, symb_temp.get(), (nsymb - lentemp)* sizeof(wchar_t) );
                 symb[nsymb - 1] = 0;
-                ret = ret_deep;
+                ret = ret + 2 + ret_deep;
             }
         }
     }
@@ -448,7 +456,7 @@ back:
 /*
 00487587   E8 0811FDFF                  CALL ollydbg._Readmemory
 0048758C   83C4 10                      ADD ESP,0x10
-将读取到的
+将读取到的缓存的最后一个'字'(unicode)置0，从而解决字符数超过256问题，不过
 */
 static PVOID patch_maxlen = (PVOID)HARDCODE(0x0048758C);
 static void __cdecl MyReadmemory(void *buf, ulong addr,ulong size,int mode)
@@ -466,7 +474,10 @@ static void __declspec(naked) patch_maxlen_do()
 {
     __asm
     {
-        call MyReadmemory
+        cmp eax,0;
+        je back;
+        call MyReadmemory; // ! MyReadmemory会改变eax值
+back:
         jmp patch_maxlen;
     }
 }
@@ -529,3 +540,4 @@ int str_patch::ODBG2_Plugininit( void )
     VirtualProtect((PVOID)0x004A33E9, 4, dwOld, &dwOld);
     return 0;
 }
+

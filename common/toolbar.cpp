@@ -419,7 +419,6 @@ int Toolbar::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
     {
         if(CToolbar_Global.init(szTB.c_str()))//"D:\\src\\vc\\holyshit\\common\\test.ini"
         {
-            Command::RegisterBultinCommand();
             CToolbar_Global.attach((HWND)Plugingetvalue(VAL_HWMAIN));
         }
     }
@@ -438,7 +437,6 @@ int Toolbar::ODBG2_Plugininit( void )
         std::string path = wstring2string(szTB.c_str(), CP_ACP);
         if(CToolbar_Global.init(path))//"D:\\src\\vc\\holyshit\\common\\test.ini"
         {
-            Command::RegisterBultinCommand();
             CToolbar_Global.attach(hwollymain);
         }
     }

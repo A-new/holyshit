@@ -11,6 +11,7 @@
 #include "../common/label.h"
 #include "../common/config.h"
 #include "../common/jmpstack.h"
+#include "../common/command_OD.h"
 
 typedef std::vector<IPlugin110*> IPLUGIN_LIST;
 IPLUGIN_LIST plugins_all;
@@ -45,6 +46,9 @@ extc int  _export cdecl ODBG_Plugininit(int ollydbgversion,HWND hw,
 
     // loadsys
     plugins_all.push_back(new LoadSys());
+
+    // command
+    plugins_all.push_back(new CCommand_OD());
 
     // toolbar
     plugins_all.push_back(new Toolbar(pCConfig));
