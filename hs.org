@@ -1,21 +1,36 @@
-* Decodeknownargument˵��
+* plan
+** TODO [#A] gui配置，包括各种功能的开关
+** TODO [#A] lua作为自定义脚本
+*** 可能要用luajit，这个带efi自动添加C函数
+** TODO [#A] 自动attach上次进程
+   不过判断是哪个进程准备用lua来做，attach也只是lua的一个函数调用而已，实际上是调用lua脚本运行，可绑定快捷键
+** TODO [#B] 比strongOD好用的CTRL+G的类似功能
+*** 背景
+ win7以后dll每次加载的基址基本都不一样了
+ 但是经常在OD/IDA/VS之间对比函数分析，需要手动计算偏移非常麻烦
+*** 该功能添加到右键菜单，或者绑定快捷键，NO NO NO~~~
+** TODO [#A] 实现qtcreator的locate功能，这下真holyshit了，意淫中...
+*** 准备绑定alt+x，结果发现是OD的退出功能，用CTRL+D算了，跟tc相似
+** TODO 内置命令，插件命令，仿nsis
+* old resource
+** Decodeknownargument说明
 extc int     cdecl Decodeknownargument(ulong addr,uchar *arg,ulong value,
                int valid,char *s,char *mask,uchar *pset[]);
- - addr ��ַ
- - arg �ַ���
- - value ֵ��Ҫ��valid���з���Ч
- - valid �����Ƿ���ʾֵ
- - s �����ʾ���ַ���
- - mask s��maskһ����0x01
- - pset ����һֱ��0
+ - addr 地址
+ - arg 字符串
+ - value 值，要看valid是有否有效
+ - valid 决定是否显示值
+ - s 最后显示的字符串
+ - mask s的mask一般是0x01
+ - pset 好像一直是0
 
-004092D4 ������win api�Ĵ洢�ͷŵط�
+004092D4 这里是win api的存储释放地方
 00126EC8   0012B2FC  |Arg1 = 0012B2FC ASCII "D:\green\odbg110\common.arg"
 
-* map�����㷨
-����ֻ��vc���ɵ���˵����IDA���ɵ�Ӧ�ð�������
-�ο�[[D:\src\TSM\TSM\Common\VNC\vncviewer\Debug\vncviewer.map][vncviewer.map]]
-�Ȱ�����0001����0002�Ķ�˵���鵽һ���׸�Name����$�ģ�����Length������0�ľ��Ǹ�0001�ı����exe��Ľ���
-* map ��c++������
+** map解析算法
+这里只对vc生成的作说明，IDA生成的应该包括其内
+参考[[D:\src\TSM\TSM\Common\VNC\vncviewer\Debug\vncviewer.map][vncviewer.map]]
+先把所有0001或者0002的段说明归到一起，首个Name不含$的，并且Length不等于0的就是该0001的编译成exe后的节名
+** map 中c++名解析
 imagehlp.dll
 UnDecorateSymbolName
