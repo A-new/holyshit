@@ -11,6 +11,7 @@
 *** 该功能添加到右键菜单，或者绑定快捷键，NO NO NO~~~
 ** TODO [#A] 实现qtcreator的locate功能，这下真holyshit了，意淫中...
 *** 准备绑定alt+x，结果发现是OD的退出功能，用CTRL+D算了，跟tc相似
+** TODO 跟踪某个API或地址的功能，便于找bug
 ** TODO 内置命令，插件命令，仿nsis
 * old resource
 ** Decodeknownargument说明
