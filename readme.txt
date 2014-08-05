@@ -25,21 +25,4 @@ toolbar_ini     -> toolbarµÄÅäÖÃiniÎÄ¼þÂ·¾¶£¬¸ÃiniµÄÄÚÈÝÉèÖÃ¼ûÊ¾Àýtoolbar.iniÎÄ¼
 label_enable    -> ÊÇ·ñÏÔÊ¾labelÀ¸£¬Ä¬ÈÏÎªÏÔÊ¾£¬ÐèÖØÆôODÉúÐ§
 enable_jmp      -> ÊÇ·ñ¿ªÆôescºÍ`Ìø×ª£¬OD2Ä¬ÈÏ¿ªÆô£¬OD1Ä¬ÈÏ²»¿ªÆô
 
-changelog ¸üÐÂÀúÊ·:
-2013Äê11ÔÂ1ÈÕ v0.3.3£¬ÒÆÖ²µ½OD2.01ÕýÊ½°æ£¬¹¦ÄÜÎÞ¸Ä±ä
-
-2013Äê7ÔÂ15ÈÕ v0.3.2£¬¸ü¸Äsys¼ÓÔØ·½Ê½£¬ÏÖÔÚ¿ÉÒÔÖ±½Óµ½´ïsysµÄOEP£¡±ãÓÚÇý¶¯ÍÑ¿Ç(ÔÝÊ±Ö»´¦ÀíÁËExAllocatePoolWithTagºÍExFreePoolWithTag)
-
-2013Äê7ÔÂ5ÈÕ v0.3.1£¬ÐÞÕýtoolbarµÄÒ»¸öbug£¬Ôö¼Ótoolbarµ÷ÓÃÄÚÖÃÃüÁîµÄ¹¦ÄÜ£¬Ö§³Öµ÷ÓÃODÆäËû²å¼þµÄ¹¦ÄÜ¡ª³õ²½Ö»Ö§³Ö
-µ÷ÓÃmenu²Ëµ¥Ïî£¬Ê¹ÓÃ·¶Àý¼ûtoolbar.ini¡£OD2Ìí¼ÓescºÍ`µÄÌø×ª(OD1Ò²ÓÐµ«ÊÇÄ¬ÈÏ²»¿ªÆô)¡£
-
-2013Äê6ÔÂ25ÈÕ v0.3£¬Ôö¼Ótoolbar(²»¼æÈÝIDAFicator)£¬labelÌí¼Óexportº¯ÊýÃûÏÔÊ¾£¬lableÏÔÊ¾¿í¶È×Ô¶¯±£´æ¡£
-labelÖ§³ÖºÏ²¢µ½commentÀ¸ÀïÈ¥£¬µ«ÊÇ»áÓöµ½Ä³Ð©µØ·½²»ÏÔÊ¾µÄÇé¿ö£¬½¨Òé¿ªÆôlabelÏÔÊ¾£¬iniÀï¿ÉÉèÖÃ
-Ôö¼ÓÅäÖÃ¡£OD201HÈ«¹¦ÄÜÍ¬²½·¢²¼¡£
-
-2013Äê5ÔÂ3ÈÕ v0.2£¬labelÏÔÊ¾Îª¸ßÁÁ£¬ÈÃOD¿ÉÒÔ¼ÓÔØÇý¶¯£¡
-¸ÐÐ»£º·è×Ó http://bbs.pediy.com/showthread.php?t=171729
-
-2013Äê5ÔÂ2ÈÕ v0.1, ÏÔÊ¾label
-
 by lynnux, Ê¼ÓÚ2013Äê5ÔÂ2ÈÕ
