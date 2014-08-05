@@ -1,8 +1,8 @@
 #include "OD2str.h"
 #include "hook.h"
 #include "StrFinder.h"
-#include "../sdk/sdk.h"
-#include "../common/define.h"
+#include "sdk.h"
+#include "define.h"
 #include <boost/shared_array.hpp>
 
 /*

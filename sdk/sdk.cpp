@@ -1,6 +1,6 @@
 #include "sdk.h"
 
-#ifdef HOLYSHIT_EXPORTS // od110
+#ifdef OD1_EXPORTS // od110
 #pragma comment(lib, "OLLYDBG110.LIB")
 #else
 #pragma comment(lib, "ollydbg201.lib")
@@ -8,7 +8,7 @@
 
 t_dump * sdk_Getcpudisasmdump()
 {
-#ifdef HOLYSHIT_EXPORTS // od110
+#ifdef OD1_EXPORTS // od110
     return (t_dump*)Plugingetvalue(VAL_CPUDASM);
 #else
     return Getcpudisasmdump();
@@ -18,7 +18,7 @@ t_dump * sdk_Getcpudisasmdump()
 // Alt + E ´°¿Ú
 t_dump * sdk_Getmodulesdump()
 {
-#ifdef HOLYSHIT_EXPORTS // od110
+#ifdef OD1_EXPORTS // od110
     return (t_dump*)Plugingetvalue(VAL_MODULES);
 #else
     return NULL;//Getcpudisasmdump();

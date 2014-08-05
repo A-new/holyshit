@@ -15,7 +15,7 @@ static int MSearch(t_table *pt,wchar_t *name,ulong index,int mode)
     return MENU_ABSENT;
 }
 
-static t_menu mainmenu[] = {
+static t_menu mainmenu1[] = {
     { L"ËÑË÷ËùÓÐ×Ö·û´®",
     L"ËÑË÷ËùÓÐ½»²æ×Ö·û´®",
     K_NONE, MSearch, NULL, 0 },
@@ -30,7 +30,7 @@ t_menu * UStrRef::ODBG2_Pluginmenu( wchar_t *type )
         {
             return NULL;
         }
-        return mainmenu;
+        return mainmenu1;
     }
     return NULL;
 }

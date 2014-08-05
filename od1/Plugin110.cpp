@@ -2,16 +2,16 @@
 #include <vector>
 #include <algorithm>
 #include <boost/bind.hpp>
-#include "../sdk/sdk.h"
-#include "../common/define.h"
-#include "../common/func.h"
-#include "../common/hook.h"
-#include "../common/toolbar.h"
-#include "../common/loadsys.h"
-#include "../common/label.h"
-#include "../common/config.h"
-#include "../common/jmpstack.h"
-#include "../common/command_OD.h"
+
+#include "holyshit.cpp"
+/*
+编译OD1特殊设置：
+多字节
+/J 默认char无符号
+/Zp1 结构对齐1字节
+TODO:
+还有几个cpp在release编译时使用了禁止优化，必须想方法去除
+*/
 
 typedef std::vector<IPlugin110*> IPLUGIN_LIST;
 IPLUGIN_LIST plugins_all;

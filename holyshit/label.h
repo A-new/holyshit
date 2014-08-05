@@ -31,7 +31,7 @@ public:
 
 struct t_table;
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
 struct t_sortheader;
 #else
 struct t_sorthdr;

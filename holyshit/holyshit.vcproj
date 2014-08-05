@@ -62,12 +62,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="D:\green\odbg110\plugins\hollyshitd.dll"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -138,14 +132,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\holyshit110.dll"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\sdk&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -179,55 +165,59 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\common\command.cpp"
+				RelativePath=".\command.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\command_OD.cpp"
+				RelativePath=".\command_OD.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\config.cpp"
+				RelativePath=".\config.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\func.cpp"
+				RelativePath=".\func.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\hook.cpp"
+				RelativePath=".\holyshit.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\jmpstack.cpp"
+				RelativePath=".\hook.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\label.cpp"
+				RelativePath=".\jmpstack.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\loadsys.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\common\map.cpp"
+				RelativePath=".\label.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Plugin110.cpp"
+				RelativePath=".\loadsys.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\common\toolbar.cpp"
+				RelativePath=".\map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OD2str.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StrFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ustrref.cpp"
 				>
 			</File>
 		</Filter>
@@ -237,7 +227,71 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath=".\command.h"
+				>
+			</File>
+			<File
+				RelativePath=".\command_OD.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\define.h"
+				>
+			</File>
+			<File
+				RelativePath=".\detours.h"
+				>
+			</File>
+			<File
+				RelativePath=".\func.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IPlugin110.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IPlugin201.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jmpstack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\label.h"
+				>
+			</File>
+			<File
+				RelativePath=".\loadsys.h"
+				>
+			</File>
+			<File
+				RelativePath=".\map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OD2str.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StrFinder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\toolbar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ustrref.h"
 				>
 			</File>
 		</Filter>
@@ -246,90 +300,14 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\holyshit.rc"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="sdk"
 			>
-			<File
-				RelativePath="..\sdk\sdk.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\sdk.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="common"
 			>
-			<File
-				RelativePath="..\common\command.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\command_OD.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\define.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\detours.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\detours_x86.lib"
-				>
-			</File>
-			<File
-				RelativePath="..\common\func.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\hook.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\IPlugin110.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\IPlugin201.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\jmpstack.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\label.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\loadsys.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\map.h"
-				>
-			</File>
-			<File
-				RelativePath="..\sdk\Plugin110.h"
-				>
-			</File>
-			<File
-				RelativePath="..\common\toolbar.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

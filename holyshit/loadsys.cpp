@@ -5,7 +5,7 @@
 
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
 PVOID OrgDllCheck = (PVOID)0x00477754; // od1.10
 PVOID OrgDllCheck3 = (PVOID)0x004778D4; // wsprint，改LOADDLL.exe为LOADSYS.exe
 PVOID OrgDllCheck4 = (PVOID)0x0042F9D2;
@@ -28,7 +28,7 @@ void __declspec(naked) MyDllCheck()
         push eax
             mov eax, dword ptr [ebp + 0x08]
         mov DllPath, eax
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
             lea eax, dword ptr [ebp - 0x08]
 #else
             lea eax, dword ptr [ebp - 0x04]
@@ -101,7 +101,7 @@ void __declspec(naked) MyDllCheck3()
 */
 
 void __cdecl Mycompare4(DWORD* ep, DWORD, DWORD, DWORD
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
         , DWORD // OD2
 #endif
                         )
@@ -129,7 +129,7 @@ void __cdecl Mycompare4(DWORD* ep, DWORD, DWORD, DWORD
     }
 }
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
 void __declspec(naked) MyDllCheck4()
 {
     __asm
@@ -266,7 +266,7 @@ static void hook_loadsys_functions()
     hook(&(PVOID&)OrgDllCheck, MyDllCheck); // 让sys后辍的可以加载
     hook(&(PVOID&)OrgDllCheck3, MyDllCheck3); // 更改loaddll为loadsys
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     hook(&(PVOID&)OrgDllCheck4, MyDllCheck4); // 设置ep为永远达不到的地址
     hook(&(PVOID&)OrgDllCheck5, MyDllCheck5); // 设置ep为永远达不到的地址
 #else // OD2

@@ -198,7 +198,7 @@ BOOL CStrFinder::FollowImmediateAddr(
     *pbFound = FALSE;
 
     pMem = Findmemory(dwImmAddr);
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
     PROCESS_ERROR(pMem && pMem->sectname[0]);
 #else
     PROCESS_ERROR(pMem && pMem->sect[0]);
@@ -210,7 +210,7 @@ BOOL CStrFinder::FollowImmediateAddr(
     PROCESS_ERROR(nRetCode);
 
     pMem = Findmemory(dwImmAddr);
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
     PROCESS_ERROR(pMem && pMem->sectname[0]);
 #else
     PROCESS_ERROR(pMem && pMem->sect[0]);
@@ -276,7 +276,7 @@ BOOL CStrFinder::Find(
     {
         dwAddr = dwBase + dwOffset;
 
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
         nRetCode = Readmemory(szCmd, dwAddr, MAXCMDSIZE, MM_SILENT);
         PROCESS_ERROR(nRetCode);
         dwCmdSize = Disasm(
@@ -303,7 +303,7 @@ BOOL CStrFinder::Find(
         )
             continue;
 
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
         ulong  immconst = da.memconst;
 #else
         ulong  immconst = da.immconst
@@ -311,7 +311,7 @@ BOOL CStrFinder::Find(
 
         pMem = Findmemory(immconst);
         if ((NULL == pMem) || 
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
             ('\0' == pMem->sectname[0]))
 #else
             ('\0' == pMem->sect[0]))

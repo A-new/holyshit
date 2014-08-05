@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <tchar.h>
 
-#ifdef HOLYSHIT_EXPORTS // od110
+#ifdef OD1_EXPORTS // od110
 #include "plugin110.h"
 #ifdef _UNICODE
 #error "only support ansi"
@@ -15,12 +15,12 @@
 #ifndef _UNICODE
 #error "only support unicode"
 #endif // _UNICODE
-#endif // HOLYSHIT_EXPORTS
+#endif // OD1_EXPORTS
 
 
 t_dump *sdk_Getcpudisasmdump();
 t_dump * sdk_Getmodulesdump();
-#ifndef HOLYSHIT_EXPORTS // od2
+#ifndef OD1_EXPORTS // od2
 void cdecl Getdisassemblerrange(ulong *pbase,ulong *psize);
 #define Findname(addr, type, image1) FindnameW(addr, type, image1, TEXTLEN)
 typedef t_sorthdr t_sortheader;
@@ -29,5 +29,5 @@ typedef t_sorthdr t_sortheader;
 #define Browsefilename(t, n, d, m) Browsefilename(t, n, 0, 0, d, hwollymain, m)
 #else // od1
 #define DRAW_VARWIDTH 0
-#endif //end HOLYSHIT_EXPORTS
+#endif //end OD1_EXPORTS
 

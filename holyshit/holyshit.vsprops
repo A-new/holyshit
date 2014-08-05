@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="gb2312"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="holyshit"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(SolutionDir)holyshit&quot;;&quot;$(SolutionDir)sdk&quot;"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories="&quot;$(SolutionDir)holyshit&quot;;&quot;$(SolutionDir)sdk&quot;"
+	/>
+</VisualStudioPropertySheet>

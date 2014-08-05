@@ -9,9 +9,9 @@
 #include <boost/foreach.hpp>
 #include "command.h"
 #include <Shlwapi.h>
-#include "../common/command_OD.h"
-#include "../sdk/sdk.h"
-#include "../common/func.h"
+#include "command_OD.h"
+#include "sdk.h"
+#include "func.h"
 
 //#pragma pack(1) // fuck!因为OD SDK强制使用了pack，必须加句，否则其他使用如CConfig_Single去地方，跟plugin110.cpp里的不一样，
 // 会出现你不能发现的问题，如string莫名其妙崩溃，release编译会有warning C4742警告，千万不要忽略！
@@ -70,7 +70,7 @@ private:
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
 PVOID OrgFillRect = (PVOID)0x00432EC7; // od1
 #else
 PVOID OrgFillRect = (PVOID)HARDCODE(0x0040C50E); // od2
@@ -309,7 +309,7 @@ void hookFillRect()
 void CToolbar::attach(HWND hWnd)
 {
     m_hWnd = hWnd;
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     m_pen = CreatePen(0, 3, 0xC0C0C0);
 #else
     m_pen = CreatePen(0, 3, 0xF0F0F0);
@@ -412,7 +412,7 @@ WNDPROC CToolbar::m_prevProc = NULL;
 
 int Toolbar::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
 {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     // toolbar相关初始化
     std::tstring szTB = m_IConfigForToolbar->get_ini_path();
     if (PathFileExistsA(szTB.c_str()))
@@ -428,7 +428,7 @@ int Toolbar::_ODBG_Plugininit( int ollydbgversion,HWND hw, ulong *features )
 
 int Toolbar::ODBG2_Plugininit( void )
 {
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
 
     // toolbar相关初始化
     std::tstring szTB = m_IConfigForToolbar->get_ini_path();

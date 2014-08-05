@@ -1,19 +1,18 @@
 #include <Shlwapi.h>
 #include <algorithm>
 #include <boost/bind.hpp>
-#include "../sdk/sdk.h"
-#include "../common/hook.h"
-#include "../common/func.h"
-#include "../common/toolbar.h"
-#include "../common/loadsys.h"
-#include "../common/label.h"
-#include "../common/define.h"
-#include "../common/config.h"
-#include "../common/command_OD.h"
-#include "../common/jmpstack.h"
-#include "../common/ustrref.h"
-#include "../common/OD2str.h"
-#include "../common/command_OD.h"
+
+#include "holyshit.cpp"
+#include "ustrref.cpp"
+//#include "StrFinder.cpp"
+#include "OD2str.cpp"
+
+/*
+OD2特殊设置：
+暂无（默认unicode编译）
+TODO:
+还有几个cpp在release编译时使用了禁止优化，必须想方法去除
+*/
 
 typedef std::vector<IPlugin201*> IPLUGIN_LIST;
 IPLUGIN_LIST plugins_all;

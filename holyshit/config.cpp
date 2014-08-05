@@ -19,7 +19,7 @@ void CConfig::loadall()
     width_comment = get_int((TCHAR*)m_ILabelForConfig->WIDTH_COMMENT(), m_ILabelForConfig->DEFAULT_WIDTH_COMMENT());
     label_enabled_ = get_int((TCHAR*)m_ILabelForConfig->LABEL_ENABLE(), 1) != 0;
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     enable_jmp = get_int(ENABLE_JMP, 0) != 0;
 #else
     enable_jmp = get_int(ENABLE_JMP, 1) != 0;
@@ -74,7 +74,7 @@ void CConfig::saveall(bool now)
 
 int CConfig::get_int( TCHAR* key, int def )
 {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     return Pluginreadintfromini(plugin_mod, key, def);
 #else
     int ret = def;
@@ -85,7 +85,7 @@ int CConfig::get_int( TCHAR* key, int def )
 
 int CConfig::set_int( TCHAR* key, int value )
 {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     return Pluginwriteinttoini(plugin_mod, key, value);
 #else
     return Writetoini(NULL, PLUGIN_NAME, key, L"%i", value);
@@ -94,7 +94,7 @@ int CConfig::set_int( TCHAR* key, int value )
 
 int CConfig::get_str( TCHAR* key, LPTSTR str_buf, LPTSTR def )
 {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     return Pluginreadstringfromini(plugin_mod, key, str_buf, def);
 #else
     return Getfromini(NULL, PLUGIN_NAME, key, L"%s", str_buf);
@@ -103,7 +103,7 @@ int CConfig::get_str( TCHAR* key, LPTSTR str_buf, LPTSTR def )
 
 int CConfig::set_str( TCHAR* key, LPTSTR str )
 {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     return Pluginwritestringtoini(plugin_mod, key, str);
 #else
     return Writetoini(NULL, PLUGIN_NAME, key, L"%s", str);

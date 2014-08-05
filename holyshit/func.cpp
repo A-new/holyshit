@@ -56,7 +56,7 @@ void LoadMap()
 bool HasDebuggee()
 {
     HANDLE procHandle = NULL;
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     procHandle = (HANDLE)Plugingetvalue(VAL_HPROCESS);
 #else
     procHandle = process;
@@ -130,7 +130,7 @@ bool IsSysFile(const TCHAR* DllPath)
 std::tstring GetDebugeedExePath()
 {
     std::tstring ret;
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
     const char* file = (const char*)Plugingetvalue(VAL_EXEFILENAME);
     ret = file;
 #else

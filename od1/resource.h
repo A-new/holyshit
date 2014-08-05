@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by holyshit.rc
+// Used by od2.rc
 
 // 新对象的下一组默认值
 // 

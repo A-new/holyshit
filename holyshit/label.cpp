@@ -21,7 +21,7 @@ int Label::DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
         // 先检查原来的有没有
         if (!g_currentLabel->m_config->label_enabled())
         {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
             itest = g_func(s, (char*)mask, select, ps, column);
 #else
             itest = g_func(s, mask, select, pt, ps, column, cache);
@@ -40,7 +40,7 @@ int Label::DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
         t_dump *p = sdk_Getcpudisasmdump();
         ulong addr = 0;
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
         addr = p->lastaddr;
 #else
         addr = p->addr;
@@ -85,7 +85,7 @@ int Label::DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
     }
     else
     {
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
         return g_func(s, (char*)mask, select, ps, column);
 #else
         return g_func(s, mask, select, pt, ps, column, cache);
@@ -93,7 +93,7 @@ int Label::DRAWFUNC_cpudasm( TCHAR *s, uchar *mask, int *select, t_table *pt, t_
     }
 }
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
 int Label::MyDRAWFUNC(char *s,char *mask,int *select,t_sortheader *ps,int column)//(char *,char *,int *,t_sortheader *,int)
 {
     return DRAWFUNC_cpudasm(s, (uchar*)mask, select, 0, ps, column, 0);
@@ -135,7 +135,7 @@ void Label::hook_label_functions()
 
                 g_func = p->drawfunc;
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
                 hook(&(PVOID&)g_func, MyDRAWFUNC);
 #else // od2
                 hook(&(PVOID&)g_func, DRAWFUNC_cpudasm);

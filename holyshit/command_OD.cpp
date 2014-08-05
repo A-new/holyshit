@@ -14,7 +14,7 @@ static void Explorer_Open(ARG_LIST_PTR)
     }
 }
 
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
 typedef int (__cdecl* MSEARCH)(t_table *pt,wchar_t *name,ulong index,int mode);
 static void OD2_SearchString(ARG_LIST_PTR)
 {
@@ -44,7 +44,7 @@ static void Pluginmenu(ARG_LIST_PTR args)
     if (hMod)
     {
 
-#ifdef HOLYSHIT_EXPORTS
+#ifdef OD1_EXPORTS
         typedef void (cdecl *ODBG_PLUGINACTION)(int origin,int action,void *item); 
         ODBG_PLUGINACTION call = (ODBG_PLUGINACTION)GetProcAddress(hMod, "_ODBG_Pluginaction");
         if (!call)
@@ -98,7 +98,7 @@ namespace Command
     {
         CCommand_Single.Register("explorer", Explorer_Open);
         CCommand_Single.Register("Pluginmenu", Pluginmenu);
-#ifndef HOLYSHIT_EXPORTS
+#ifndef OD1_EXPORTS
         CCommand_Single.Register("SearchString", OD2_SearchString);
 #endif
     }
